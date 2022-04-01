@@ -95,3 +95,7 @@ new <- rbind(cork1,dublin1,kerry1,mayo1)
 new %>% ggplot(aes(Winner, fill = Winner)) + geom_bar()
 ```
 
+```{r}
+dub %>% 
+```
+
