@@ -1,0 +1,62 @@
+---
+title: "Exploring the data - Jade"
+author: "Jade Sweeney"
+date: "01/04/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)(
+library(tidyverse)
+```
+
+```{r}
+gaa$Team_Outcome <- as.factor(gaa$Team_Outcome)
+
+# For question, other teams' performance in Croke Park
+dublin <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% 
+  filter(Venue == "CROKE PARK")
+# 31 observations
+
+mayo <- gaa %>% filter(Opp_Name == "MAYO" | Team_Name == "MAYO") %>% 
+  filter(Venue == "CROKE PARK") %>%  filter(Division == "1")
+# 12 observations
+ 
+kerry <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>% 
+  filter(Venue == "CROKE PARK") %>%  filter(Division == "1")
+# 8 observations
+
+cork <- gaa %>% filter(Opp_Name == "CORK" | Team_Name == "CORK") %>% 
+  filter(Venue == "CROKE PARK") %>%  filter(Division == "1")
+# 10 observations
+
+
+# If we want to look at Dublin's performance in other venues, not much to choose from
+dub <-  gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN")
+ 
+dub_parnell <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% filter(Venue == "PARNELL PARK")
+# 11 observations
+
+dub_mchale <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% filter(Venue == "MCHALE PARK")
+# 3 observations
+
+dub_fitz <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% filter(Venue == "FITZGERALD STADIUM")
+# 4 observations
+
+# Kerry is the county that has won the most championship, maybe we focus on Kerry?
+ker <-  gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY")
+
+ker_tralee <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>% filter(Venue == "TRALEE" | Venue == "AUSTIN STACK PARK")
+# 16 observations
+
+ker_fitz <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>% filter(Venue == "FITZGERALD STADIUM")
+# 14 observations
+```
+ We do not have enoguh data to do Dublin's performance elsewhere in my opinion.
+
+
+Let's say I want to now create a variable that gives the number of wins
+```{r}
+
+```
+
