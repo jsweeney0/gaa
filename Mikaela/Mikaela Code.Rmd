@@ -1,0 +1,69 @@
+---
+title: "Code"
+author: "Mikaela Sminia 19250793"
+date: "3/29/2022"
+output: html_document
+---
+librarys
+```{r}
+library("tidyverse")
+load("gaa.Rdata")
+```
+
+
+```{r}
+
+g <- gaa %>% 
+  filter(Venue == "CROKE PARK")
+g
+dublin_gaa<- gaa %>% 
+  filter(Venue == "CROKE PARK") %>% 
+  filter(Opp_Name == "DUBLIN"| Opp_Name == "DUBLIN")
+dublin_gaa
+#31
+gaa %>% 
+  filter(Venue == "CROKE PARK") %>% 
+  filter(Team_Name == "KERRY"|Opp_Name == "KERRY")
+#8
+gaa %>% 
+  filter(Venue == "CROKE PARK") %>% 
+  filter(Team_Name == "TYRONE" |Opp_Name =="TYRONE" )
+#9
+gaa %>% 
+  filter(Venue == "CROKE PARK") %>% 
+  filter(Team_Name == "MAYO" |Opp_Name =="MAYO" )
+#12
+gaa %>% 
+  filter(Venue == "CROKE PARK") %>% 
+  filter(Team_Name == "DONEGAL" |Opp_Name =="DONEGAL" )
+#10
+```
+
+Graphs
+### First graph(basic)
+1. bar graph showing the way dublin has played in all stadiums(x)
+2. CROKE PARk highlighted green
+3. according to wins/points scored?
+```{r}
+dublin_gaa<- gaa %>% 
+  filter(Opp_Name == "DUBLIN") %>% 
+  filter(Team_Outcome == "LOSS") %>%   #dublin is always Opp
+  tally(Team_Outcome) %>% #unable to figure out how to tally
+  ggplot(aes(x= Venue , y=Team_Outcome))+
+  geom_histogram()
+dublin_gaa
+
+
+```
+
+### Second graph
+1. bar graph showing the way all teams has played in CROKE PARK
+2. DUBLIN highlighted in dublin color
+3. according to wins/points scored?
+
+### Third Graph (3d)
+1. venue vs teams vs wins
+2. where do each team win the most
+3. Dublin, CROKE PARK highlighted in green
+4. Everyone else in orange
+5. star every outlier
