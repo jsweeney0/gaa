@@ -1,0 +1,97 @@
+---
+title: "Exploring the data - Jade"
+author: "Jade Sweeney"
+date: "01/04/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(tsibble)
+library(ggfortify)
+```
+
+```{r}
+gaa$Team_Outcome <- as.factor(gaa$Team_Outcome)
+
+# For question, other teams' performance in Croke Park
+dublin <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% 
+  filter(Venue == "CROKE PARK")
+# 31 observations
+
+mayo <- gaa %>% filter(Opp_Name == "MAYO" | Team_Name == "MAYO") %>% 
+  filter(Venue == "CROKE PARK") %>%  filter(Division == "1")
+# 12 observations
+ 
+kerry <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>% 
+  filter(Venue == "CROKE PARK") %>%  filter(Division == "1")
+# 8 observations
+
+cork <- gaa %>% filter(Opp_Name == "CORK" | Team_Name == "CORK") %>% 
+  filter(Venue == "CROKE PARK") %>%  filter(Division == "1")
+# 10 observations
+
+# If we want to look at Dublin's performance in other venues, not much to choose from
+dub <-  gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN")
+ 
+dub_parnell <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% filter(Venue == "PARNELL PARK")
+# 11 observations
+
+dub_mchale <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% filter(Venue == "MCHALE PARK")
+# 3 observations
+
+dub_fitz <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% filter(Venue == "FITZGERALD STADIUM")
+# 4 observations
+
+# Kerry is the county that has won the most championship, maybe we focus on Kerry?
+ker <-  gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") 
+
+ker_tralee <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>% filter(Venue == "TRALEE" | Venue == "AUSTIN STACK PARK") 
+# 16 observations
+
+ker_fitz <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>% filter(Venue == "FITZGERALD STADIUM")
+# 14 observations
+
+```
+ We do not have enough data to do Dublin's performance elsewhere in my opinion.
+
+
+Let's say I want to now create a variable that gives the number of wins.
+For Croke Park. We want to focus on performance, so whether they win or lose, and how many points they score.
+```{r}
+# Creates a new variable Winner that tells us whether the team in question won or not
+
+mayo1 <- mayo %>%
+  mutate(Winner = case_when(Team_Name == "MAYO" & Team_Outcome == "WIN" ~ 'MAYO',
+                            Team_Name == "MAYO" & Team_Outcome == "LOSS" ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Outcome == "LOSS" ~ 'MAYO',
+                            Opp_Name == "MAYO" & Team_Outcome == "WIN" ~ 'OTHER TEAM'))
+
+kerry1 <- kerry %>%
+  mutate(Winner = case_when(Team_Name == "KERRY" & Team_Outcome == "WIN" ~ 'KERRY',
+                            Team_Name == "KERRY" & Team_Outcome == "LOSS" ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Outcome == "LOSS" ~ 'KERRY',
+                            Opp_Name == "KERRY" & Team_Outcome == "WIN" ~ 'OTHER TEAM'))
+
+dublin1 <- dublin %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Outcome == "WIN" ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Outcome == "LOSS" ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Outcome == "LOSS" ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Outcome == "WIN" ~ 'OTHER TEAM'))
+
+cork1 <-cork %>%
+  mutate(Winner = case_when(Team_Name == "CORK" & Team_Outcome == "WIN" ~ 'CORK',
+                            Team_Name == "CORK" & Team_Outcome == "LOSS" ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Outcome == "LOSS" ~ 'CORK',
+                            Opp_Name == "CORK" & Team_Outcome == "WIN" ~ 'OTHER TEAM'))
+
+
+
+
+new <- rbind(cork1,dublin1,kerry1,mayo1)
+
+new %>% ggplot(aes(Winner, fill = Winner)) + geom_bar()
+```
+

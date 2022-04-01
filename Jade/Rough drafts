@@ -1,0 +1,11 @@
+Your report should consist of the following sections:
+
+Introduction- describes the data and your question of interest.
+Data adjustments- calculations necessary to put data into appropriate shape for analysis, if any
+Analysis section with up to four plots. Each plot should be accompanied by a paragraph explaining the graphic and what you learned from it.
+Then write a concluding paragraph summarising your finds.
+
+INTRODUCTION
+
+Our data is the gaa dataset. It contains 1944 observations of Gaelic Athletic Association matches from 2001 to 2017. This includes the teams that played, the division, the venue, the date and the scores. 
+An infamous claim is that Dublin always plays better in Croke Park, one of the major stadiums in the GAA. It's location gives Dublin a home advantage, however we would like to check if this is true. Does the venue have any impact on Dublin's play or does Croke Park have no impact on the skill of the team? Our proposed research question is 'What is the impact of Croke Park on Dublin's match performance in division 1 games and how does this compare to other top counties' performance in the same venue'.
