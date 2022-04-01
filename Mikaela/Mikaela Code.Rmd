@@ -48,7 +48,7 @@ Graphs
 dublin_gaa<- gaa %>% 
   filter(Opp_Name == "DUBLIN") %>% 
   filter(Team_Outcome == "LOSS") %>%   #dublin is always Opp
-  tally(Team_Outcome) %>% #unable to figure out how to tally
+  count(Venue)
   ggplot(aes(x= Venue , y=Team_Outcome))+
   geom_histogram()
 dublin_gaa
