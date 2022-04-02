@@ -96,6 +96,50 @@ new %>% ggplot(aes(Winner, fill = Winner)) + geom_bar()
 ```
 
 ```{r}
-dub %>% 
+
+dublin2 <- dublin %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+cork2 <- cork %>%
+  mutate(Winner = case_when(Team_Name == "CORK" & Team_Score<Opp_Score ~ 'CORK',
+                            Team_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score<Opp_Score  ~ 'CORK',
+                            Opp_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE'))
+
+kerry2 <- kerry %>%
+  mutate(Winner = case_when(Team_Name == "KERRY" & Team_Score<Opp_Score ~ 'KERRY',
+                            Team_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score<Opp_Score  ~ 'KERRY',
+                            Opp_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE'))
+
+mayo2 <- mayo %>%
+  mutate(Winner = case_when(Team_Name == "MAYO" & Team_Score<Opp_Score ~ 'MAYO',
+                            Team_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score<Opp_Score  ~ 'MAYO',
+                            Opp_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE'))
+
+new1 <- rbind(dublin2,cork2,kerry2,mayo2)
+
+new1 %>% ggplot(aes(Winner, fill = Winner)) + geom_bar()
+
+dub  %>% 
+  filter(Team_Outcome == "LOSS") %>% count(Venue) %>% ggplot(aes(x=Venue, y = Team_Outcome)) + geom_histogram()
+dublin_gaa<- gaa %>% 
+  filter(Opp_Name == "DUBLIN") %>% 
+  filter(Team_Outcome == "LOSS") %>%   #dublin is always Opp
+  count(Venue)
+  ggplot(aes(x= Venue , y=Team_Outcome))+
+  geom_histogram()
 ```
 
