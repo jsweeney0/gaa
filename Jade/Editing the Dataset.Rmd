@@ -1,0 +1,81 @@
+---
+title: "Editing the Datasets"
+author: "Jade Sweeney"
+date: "04/04/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(tsibble)
+library(ggfortify)
+library(grid)
+library(gridExtra)
+library(xlsx)
+library(readxl)
+```
+
+
+There were several missing values in the Venue column of the gaa dataset. I found a lot of the venues were listed on Wikipedia and I wanted to edit the dataset to include these. I seperated each of the datasets into division 1 and by each of the top 4 teams. I then exported these as excel files and edited the missing values in on Excel. I then re-read the datasets into R and continued on as usual.
+
+```{r}
+load("gaa.Rdata")
+
+dub_gaa <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+cork_gaa <- gaa %>% filter(Opp_Name == "CORK" | Team_Name == "CORK") %>%  filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "CORK" & Team_Score<Opp_Score ~ 'CORK',
+                            Team_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score<Opp_Score  ~ 'CORK',
+                            Opp_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE'))
+
+mayo_gaa <- gaa %>% filter(Opp_Name == "MAYO" | Team_Name == "MAYO") %>%  filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "MAYO" & Team_Score<Opp_Score ~ 'MAYO',
+                            Team_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score<Opp_Score  ~ 'MAYO',
+                            Opp_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE'))
+
+ 
+kerry_gaa <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>%  filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "KERRY" & Team_Score<Opp_Score ~ 'KERRY',
+                            Team_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score<Opp_Score  ~ 'KERRY',
+                            Opp_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE'))
+
+
+write.xlsx(dub_gaa, file = "dub_gaa.xlsx",
+           sheetName = "GAA", append = FALSE)
+
+write.xlsx(kerry_gaa, file = "kerry_gaa.xlsx",
+           sheetName = "GAA", append = FALSE)
+
+write.xlsx(cork_gaa, file = "cork_gaa.xlsx",
+           sheetName = "GAA", append = FALSE)
+
+write.xlsx(mayo_gaa, file = "mayo_gaa.xlsx",
+           sheetName = "GAA", append = FALSE)
+```
+
+
+```{r}
+load("gaa.Rdata")
+cork_gaa <- read_excel("cork_gaa.xlsx")
+dub_gaa <- read_excel("dub_gaa.xlsx")
+kerry_gaa <- read_excel("kerry_gaa.xlsx")
+mayo_gaa <- read_excel("mayo_gaa.xlsx")
+```
+
