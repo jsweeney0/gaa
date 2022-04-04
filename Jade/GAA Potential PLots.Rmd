@@ -1,0 +1,120 @@
+---
+title: "GAA Potential Plots"
+author: "Jade Sweeney"
+date: "04/04/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(tsibble)
+library(ggfortify)
+library(grid)
+library(gridExtra)
+load("gaa.Rdata")
+```
+
+
+## Each of the 4 Teams' Performances in Croke Park
+```{r, echo = FALSE}
+dublin <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% 
+  filter(Venue == "CROKE PARK") %>% filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+cork <- gaa %>% filter(Opp_Name == "CORK" | Team_Name == "CORK") %>% 
+  filter(Venue == "CROKE PARK") %>%  filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "CORK" & Team_Score<Opp_Score ~ 'CORK',
+                            Team_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score<Opp_Score  ~ 'CORK',
+                            Opp_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE'))
+
+mayo <- gaa %>% filter(Opp_Name == "MAYO" | Team_Name == "MAYO") %>% 
+  filter(Venue == "CROKE PARK") %>%  filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "MAYO" & Team_Score<Opp_Score ~ 'MAYO',
+                            Team_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score<Opp_Score  ~ 'MAYO',
+                            Opp_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE'))
+
+ 
+kerry <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>% 
+  filter(Venue == "CROKE PARK") %>%  filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "KERRY" & Team_Score<Opp_Score ~ 'KERRY',
+                            Team_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score<Opp_Score  ~ 'KERRY',
+                            Opp_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE'))
+
+
+
+new <- rbind(dublin,cork,kerry,mayo)
+
+new %>% ggplot(aes(Winner, fill = Winner)) + geom_bar()
+
+dub_plot <- dublin %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE) + ylim(0,25)  + labs(subtitle = "Dublin", x = NULL, y = "Number of Wins")
+mayo_plot <- mayo %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE) + ylim(0,25)  + labs(subtitle = "Mayo", x = NULL, y = "Number of Wins")
+kerry_plot <- kerry %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE) + ylim(0,25)  + labs(subtitle = "Kerry", x = NULL, y = "Number of Wins")
+cork_plot <- cork %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE) + ylim(0,25)  + labs(subtitle = "Cork", x = NULL, y = "Number of Wins")
+
+grid.arrange(dub_plot,mayo_plot,kerry_plot,cork_plot, ncol=2, nrow=2,
+     top = textGrob("Top 4 Teams' Performance in Croke Park",gp=gpar(fontsize=15,font=4)))
+```
+
+## Dublin's Performance in its top 4 Venues
+```{r,echo = FALSE}
+dub_croke <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% 
+  filter(Venue == "CROKE PARK") %>% filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+dub_parnell <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% 
+  filter(Venue == "PARNELL PARK") %>% filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+dub_mchale <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% 
+  filter(Venue == "MCHALE PARK") %>% filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+dub_fitz <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% 
+  filter(Venue == "FITZGERALD STADIUM") %>% filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+
+croke_plot <- dub_croke %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE) + ylim(0,25) + labs(subtitle = "Croke Park", x = NULL, y = "Number of Wins")
+parnell_plot <- dub_parnell %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE) + ylim(0,25) + labs(subtitle = "Parnell Park", x = NULL, y = "Number of Wins")
+mchale_plot <- dub_mchale %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE) + ylim(0,25) + labs(subtitle = "Mchale Park", x = NULL, y = "Number of Wins")
+fitz_plot <- dub_fitz %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE) + ylim(0,25) + labs(subtitle = "Fitzgerald Stadium", x = NULL, y = "Number of Wins")
+
+grid.arrange(croke_plot,parnell_plot,mchale_plot,fitz_plot, ncol=2, nrow=2,
+     top = textGrob("Dublin's Wins Across Top 4 Stadiums",gp=gpar(fontsize=15,font=4)))
+```
