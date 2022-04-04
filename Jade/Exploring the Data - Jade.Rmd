@@ -16,6 +16,9 @@ library(gridExtra)
 ```
 
 ```{r}
+
+data <- gaa %>% filter(Opp_Name == "MAYO" | Team_Name == "MAYO") %>%  filter(Division == "1")
+
 gaa$Team_Outcome <- as.factor(gaa$Team_Outcome)
 
 # For question, other teams' performance in Croke Park
@@ -51,6 +54,7 @@ dub_fitz <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% fil
 ```
  We do not have enough data to do Dublin's performance elsewhere in my opinion.
 
+With the dub dataset, there are a set of 4 matches in 2011 that says Venue = Dublin. Wikipedia shows that these matches took place in Croke Park. So I want to edit the intial gaa dataset to change these variables to Croke Park so that we can include them.
 
 Let's say I want to now create a variable that gives the number of wins.
 For Croke Park. We want to focus on performance, so whether they win or lose, and how many points they score.
@@ -140,3 +144,88 @@ grid.arrange(dub_plot,mayo_plot,kerry_plot,cork_plot, ncol=2, nrow=2,
      top = textGrob("Number of Wins in Croke Park",gp=gpar(fontsize=20,font=3)))
 ```
 
+# Empty Venue Variables
+```{r}
+dub_gaa <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+cork_gaa <- gaa %>% filter(Opp_Name == "CORK" | Team_Name == "CORK") %>%  filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "CORK" & Team_Score<Opp_Score ~ 'CORK',
+                            Team_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score<Opp_Score  ~ 'CORK',
+                            Opp_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE'))
+
+mayo_gaa <- gaa %>% filter(Opp_Name == "MAYO" | Team_Name == "MAYO") %>%  filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "MAYO" & Team_Score<Opp_Score ~ 'MAYO',
+                            Team_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score<Opp_Score  ~ 'MAYO',
+                            Opp_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE'))
+
+ 
+kerry_gaa <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>%  filter(Division == "1") %>%
+  mutate(Winner = case_when(Team_Name == "KERRY" & Team_Score<Opp_Score ~ 'KERRY',
+                            Team_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score<Opp_Score  ~ 'KERRY',
+                            Opp_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE'))
+
+
+
+gaa1 <- rbind(dub_gaa,cork_gaa,kerry_gaa,mayo_gaa)
+
+edit(gaa1)
+
+
+```
+
+There are 143 rows out of 457 that have an empty venue variable. Wikipedia has the data that will tell us what those venues are. 
+```{r}
+dublin <- dub_gaa %>% filter(Venue == "CROKE PARK") %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+cork <- cork_gaa %>% filter(Venue == "CROKE PARK") %>%
+  mutate(Winner = case_when(Team_Name == "CORK" & Team_Score<Opp_Score ~ 'CORK',
+                            Team_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score<Opp_Score  ~ 'CORK',
+                            Opp_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE'))
+
+mayo <- mayo_gaa %>%  filter(Venue == "CROKE PARK")  %>%
+  mutate(Winner = case_when(Team_Name == "MAYO" & Team_Score<Opp_Score ~ 'MAYO',
+                            Team_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score<Opp_Score  ~ 'MAYO',
+                            Opp_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE'))
+
+ 
+kerry <- kerry_gaa %>% filter(Venue == "CROKE PARK") %>%
+  mutate(Winner = case_when(Team_Name == "KERRY" & Team_Score<Opp_Score ~ 'KERRY',
+                            Team_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score<Opp_Score  ~ 'KERRY',
+                            Opp_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE'))
+
+new <- rbind(dublin,cork,kerry,mayo)
+
+new %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(colour = "gray40") 
+```
+
+This added approx 4 more values to cork, 
