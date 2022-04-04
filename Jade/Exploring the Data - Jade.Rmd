@@ -11,6 +11,8 @@ library(tidyverse)
 library(ggplot2)
 library(tsibble)
 library(ggfortify)
+library(grid)
+library(gridExtra)
 ```
 
 ```{r}
@@ -45,14 +47,6 @@ dub_mchale <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% f
 dub_fitz <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% filter(Venue == "FITZGERALD STADIUM")
 # 4 observations
 
-# Kerry is the county that has won the most championship, maybe we focus on Kerry?
-ker <-  gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") 
-
-ker_tralee <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>% filter(Venue == "TRALEE" | Venue == "AUSTIN STACK PARK") 
-# 16 observations
-
-ker_fitz <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>% filter(Venue == "FITZGERALD STADIUM")
-# 14 observations
 
 ```
  We do not have enough data to do Dublin's performance elsewhere in my opinion.
@@ -92,7 +86,7 @@ cork1 <-cork %>%
 
 new <- rbind(cork1,dublin1,kerry1,mayo1)
 
-new %>% ggplot(aes(Winner, fill = Winner)) + geom_bar()
+new %>% ggplot(aes(Winner, fill = Winner)) + geom_bar() +facet_wrap(Winner)
 ```
 
 ```{r}
@@ -133,13 +127,16 @@ new1 <- rbind(dublin2,cork2,kerry2,mayo2)
 
 new1 %>% ggplot(aes(Winner, fill = Winner)) + geom_bar()
 
-dub  %>% 
-  filter(Team_Outcome == "LOSS") %>% count(Venue) %>% ggplot(aes(x=Venue, y = Team_Outcome)) + geom_histogram()
-dublin_gaa<- gaa %>% 
-  filter(Opp_Name == "DUBLIN") %>% 
-  filter(Team_Outcome == "LOSS") %>%   #dublin is always Opp
-  count(Venue)
-  ggplot(aes(x= Venue , y=Team_Outcome))+
-  geom_histogram()
+```
+
+Plot that highlights the number of wins and losses for each of the 4 teams in Croke Park. It clearly shows that Dublin has a much higher number of wins compared to the others, but also that is has played many more times in Croke Park.
+```{r}
+dub_plot <- dublin2 %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE) + ylim(0,25)
+mayo_plot <- mayo2 %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE) + ylim(0,25)
+kerry_plot <- kerry2 %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE) + ylim(0,25)
+cork_plot <- cork2 %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE) + ylim(0,25)
+
+grid.arrange(dub_plot,mayo_plot,kerry_plot,cork_plot, ncol=2, nrow=2,
+     top = textGrob("Number of Wins in Croke Park",gp=gpar(fontsize=20,font=3)))
 ```
 
