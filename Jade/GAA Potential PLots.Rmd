@@ -16,8 +16,6 @@ library(gridExtra)
 load("gaa.Rdata")
 ```
 
-
-## Each of the 4 Teams' Performances in Croke Park
 ```{r, echo = FALSE}
 dublin <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% 
   filter(Venue == "CROKE PARK") %>% filter(Division == "1") %>%
@@ -60,7 +58,7 @@ kerry <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>%
 
 new <- rbind(dublin,cork,kerry,mayo)
 
-new %>% ggplot(aes(Winner, fill = Winner)) + geom_bar() 
+new %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(colour = "gray40") 
 
 dub_plot <- dublin %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,25)  + labs(subtitle = "Dublin", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
 
@@ -74,7 +72,6 @@ grid.arrange(dub_plot,mayo_plot,kerry_plot,cork_plot, ncol=2, nrow=2,
      top = textGrob("Top 4 Teams' Performance in Croke Park",gp=gpar(fontsize=15,font=4)))
 ```
 
-## Dublin's Performance in its top 4 Venues
 ```{r,echo = FALSE}
 dub_croke <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% 
   filter(Venue == "CROKE PARK") %>% filter(Division == "1") %>%
