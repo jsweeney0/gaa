@@ -2,7 +2,9 @@
 title: "GAA Potential Plots"
 author: "Jade Sweeney"
 date: "04/04/2022"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -13,12 +15,21 @@ library(tsibble)
 library(ggfortify)
 library(grid)
 library(gridExtra)
+library(readxl)
 load("gaa.Rdata")
+cork_gaa <- read_excel("cork_gaa.xlsx")
+dub_gaa <- read_excel("dub_gaa.xlsx")
+kerry_gaa <- read_excel("kerry_gaa.xlsx")
+mayo_gaa <- read_excel("mayo_gaa.xlsx")
 ```
+  
+  
+This first plot is the plot of the outcomes in the Winner variable, this describes whether one of our 4 teams won, the other team won or if it was a tie.  
 
 ```{r, echo = FALSE}
-dublin <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% 
-  filter(Venue == "CROKE PARK") %>% filter(Division == "1") %>%
+# Load in the gaa excel files ( which have the added venue variables)
+
+dublin <- dub_gaa %>% filter(Venue == "CROKE PARK") %>%
   mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
                             Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
                             Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
@@ -26,8 +37,7 @@ dublin <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>%
                             Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
                             Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
 
-cork <- gaa %>% filter(Opp_Name == "CORK" | Team_Name == "CORK") %>% 
-  filter(Venue == "CROKE PARK") %>%  filter(Division == "1") %>%
+cork <- cork_gaa %>% filter(Venue == "CROKE PARK") %>%
   mutate(Winner = case_when(Team_Name == "CORK" & Team_Score<Opp_Score ~ 'CORK',
                             Team_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
                             Opp_Name == "CORK" & Team_Score<Opp_Score  ~ 'CORK',
@@ -35,8 +45,7 @@ cork <- gaa %>% filter(Opp_Name == "CORK" | Team_Name == "CORK") %>%
                             Opp_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE',
                             Team_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE'))
 
-mayo <- gaa %>% filter(Opp_Name == "MAYO" | Team_Name == "MAYO") %>% 
-  filter(Venue == "CROKE PARK") %>%  filter(Division == "1") %>%
+mayo <- mayo_gaa %>%  filter(Venue == "CROKE PARK")  %>%
   mutate(Winner = case_when(Team_Name == "MAYO" & Team_Score<Opp_Score ~ 'MAYO',
                             Team_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
                             Opp_Name == "MAYO" & Team_Score<Opp_Score  ~ 'MAYO',
@@ -45,8 +54,7 @@ mayo <- gaa %>% filter(Opp_Name == "MAYO" | Team_Name == "MAYO") %>%
                             Team_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE'))
 
  
-kerry <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>% 
-  filter(Venue == "CROKE PARK") %>%  filter(Division == "1") %>%
+kerry <- kerry_gaa %>% filter(Venue == "CROKE PARK") %>%
   mutate(Winner = case_when(Team_Name == "KERRY" & Team_Score<Opp_Score ~ 'KERRY',
                             Team_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
                             Opp_Name == "KERRY" & Team_Score<Opp_Score  ~ 'KERRY',
@@ -54,27 +62,34 @@ kerry <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>%
                             Opp_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE',
                             Team_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE'))
 
-
-
 new <- rbind(dublin,cork,kerry,mayo)
 
 new %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(colour = "gray40") 
 
-dub_plot <- dublin %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,25)  + labs(subtitle = "Dublin", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
+```
+  
+  
+This next plot shows the top 4 teams and their performance at Croke Park. We can clearly see that Dublin plays in Croke Park at a much higher frequency, does this give them an advantage in and of itself? We can also clearly see that Dublin's win to loss ratio is much much higher than the other 4 teams.   
 
-mayo_plot <- mayo %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,25)  + labs(subtitle = "Mayo", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#ff0000","green4","808080"))
+```{r, echo = FALSE}
 
-kerry_plot <- kerry %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,25)  + labs(subtitle = "Kerry", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#ffff00","chartreuse4","808080"))
+dub_plot <- dublin %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30)  + labs(subtitle = "Dublin", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
 
-cork_plot <- cork %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,25)  + labs(subtitle = "Cork", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#ff0000","white","808080"))
+mayo_plot <- mayo %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30)  + labs(subtitle = "Mayo", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#ff0000","green4","808080"))
+
+kerry_plot <- kerry %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30)  + labs(subtitle = "Kerry", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#ffff00","chartreuse4","808080"))
+
+cork_plot <- cork %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30)  + labs(subtitle = "Cork", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#ff0000","white","808080"))
 
 grid.arrange(dub_plot,mayo_plot,kerry_plot,cork_plot, ncol=2, nrow=2,
      top = textGrob("Top 4 Teams' Performance in Croke Park",gp=gpar(fontsize=15,font=4)))
 ```
+  
+  
+This next plot shows Dublin's performance in its most played stadiums. Again we see that Dublin has played in Croke Park very frequently and again its win to loss ratio is much higher in Croke Park than in other stadiums.  
 
 ```{r,echo = FALSE}
-dub_croke <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% 
-  filter(Venue == "CROKE PARK") %>% filter(Division == "1") %>%
+dub_croke <- dub_gaa %>% filter(Venue == "CROKE PARK") %>%
   mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
                             Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
                             Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
@@ -82,8 +97,7 @@ dub_croke <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>%
                             Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
                             Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
 
-dub_parnell <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% 
-  filter(Venue == "PARNELL PARK") %>% filter(Division == "1") %>%
+dub_parnell <- dub_gaa %>% filter(Venue == "PARNELL PARK") %>%
   mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
                             Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
                             Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
@@ -91,8 +105,7 @@ dub_parnell <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>%
                             Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
                             Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
 
-dub_mchale <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% 
-  filter(Venue == "MCHALE PARK") %>% filter(Division == "1") %>%
+dub_mchale <- dub_gaa %>% filter(Venue == "MCHALE PARK") %>%
   mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
                             Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
                             Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
@@ -100,8 +113,7 @@ dub_mchale <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>%
                             Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
                             Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
 
-dub_fitz <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% 
-  filter(Venue == "FITZGERALD STADIUM") %>% filter(Division == "1") %>%
+dub_fitz <- dub_gaa %>% filter(Venue == "FITZGERALD STADIUM") %>%
   mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
                             Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
                             Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
@@ -110,13 +122,13 @@ dub_fitz <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>%
                             Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
 
 
-croke_plot <- dub_croke %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,25) + labs(subtitle = "Croke Park", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
+croke_plot <- dub_croke %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30) + labs(subtitle = "Croke Park", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
 
-parnell_plot <- dub_parnell %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,25) + labs(subtitle = "Parnell Park", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
+parnell_plot <- dub_parnell %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30) + labs(subtitle = "Parnell Park", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
 
-mchale_plot <- dub_mchale %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,25) + labs(subtitle = "Mchale Park", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
+mchale_plot <- dub_mchale %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30) + labs(subtitle = "Mchale Park", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
 
-fitz_plot <- dub_fitz %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,25) + labs(subtitle = "Fitzgerald Stadium", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
+fitz_plot <- dub_fitz %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30) + labs(subtitle = "Fitzgerald Stadium", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
 
 grid.arrange(croke_plot,parnell_plot,mchale_plot,fitz_plot, ncol=2, nrow=2,
      top = textGrob("Dublin's Wins Across Top 4 Stadiums",gp=gpar(fontsize=15,font=4)))
