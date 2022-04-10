@@ -8,52 +8,100 @@ librarys
 ```{r}
 library("tidyverse")
 load("gaa.Rdata")
+library(scatterplot3d)
+```
+
+# gaa data
+
+## code to check for na's in columns 
+```{r}
+#NOT for seeing where they are
+sum(is.na(gaa$Venue)|gaa$Venue == "")
+sum(is.na(gaa$Team_Outcome)|gaa$Team_Outcome == "UNKNOWN")
+#Venue is the only one with missing values
+```
+## 
+```{r}
+df2<-df1[!(df1$Name=="George" | df1$Name=="Andrea"),]
 ```
 
 
+### Code for all teams we are looking at with all venues
 ```{r}
+DUBLIN_gaa<- gaa %>%
+  filter(Team_Name == "DUBLIN"| Opp_Name == "DUBLIN")
 
-g <- gaa %>% 
-  filter(Venue == "CROKE PARK")
-g
-dublin_gaa<- gaa %>% 
-  filter(Venue == "CROKE PARK") %>% 
-  filter(Opp_Name == "DUBLIN"| Opp_Name == "DUBLIN")
-dublin_gaa
-#31
-gaa %>% 
-  filter(Venue == "CROKE PARK") %>% 
+KERRY_gaa <- gaa %>% 
   filter(Team_Name == "KERRY"|Opp_Name == "KERRY")
-#8
-gaa %>% 
-  filter(Venue == "CROKE PARK") %>% 
-  filter(Team_Name == "TYRONE" |Opp_Name =="TYRONE" )
-#9
-gaa %>% 
-  filter(Venue == "CROKE PARK") %>% 
+
+CORK_gaa <- gaa %>%  
+  filter(Team_Name == "CORK" |Opp_Name =="CORK" )
+
+MAYO_gaa<- gaa %>%
   filter(Team_Name == "MAYO" |Opp_Name =="MAYO" )
-#12
-gaa %>% 
-  filter(Venue == "CROKE PARK") %>% 
-  filter(Team_Name == "DONEGAL" |Opp_Name =="DONEGAL" )
-#10
+
+county_gaa1 <- rbind(DUBLIN_gaa,KERRY_gaa,CORK_gaa,MAYO_gaa) %>% 
+  subset (select = -c(Team_Outcome, Date, Game_Round))   #removes these things as do not plan to use them
+  
+county_gaa1 #with all extra teams
+
 ```
 
-Graphs
-### First graph(basic)
-1. bar graph showing the way dublin has played in all stadiums(x)
-2. CROKE PARk highlighted green
-3. according to wins/points scored?
+## improved with Winner variable found in JAdes code
+Dublin
+Cork
+Kerry
+Mayo
 ```{r}
-dublin_gaa<- gaa %>% 
-  filter(Opp_Name == "DUBLIN") %>% 
-  filter(Team_Outcome == "LOSS") %>%   #dublin is always Opp
-  count(Venue)
-  ggplot(aes(x= Venue , y=Team_Outcome))+
-  geom_histogram()
-dublin_gaa
+  
+county_gaa <- county_gaa1 %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "CORK" & Team_Score<Opp_Score ~ 'CORK',
+                            Team_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score<Opp_Score  ~ 'CORK',
+                            Opp_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "KERRY" & Team_Score<Opp_Score ~ 'KERRY',
+                            Team_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score<Opp_Score  ~ 'KERRY',
+                            Opp_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "MAYO" & Team_Score<Opp_Score ~ 'MAYO',
+                            Team_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score<Opp_Score  ~ 'MAYO',
+                            Opp_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE'))
+county_gaa #all counties we are looking at 
+```
+# Venues filter
+Venue == "CROKE PARK"
+Venue == "PARNELL PARK"
+Venue == "MCHALE PARK"
+Venue == "FITZGERALD STADIUM"
+Base on Jades code
+```{r}
+venue_gaa <- county_gaa %>% 
+  filter(Venue == c("CROKE PARK", "PARNELL PARK", "MCHALE PARK", "FITZGERALD STADIUM"))
+venue_gaa
+```
 
 
+# Graphs
+### 1st graph : Scatterplot
+-Points vs Venue, colour team
+```{r}
+
+team_graph <- ggplot(venue_gaa , aes(x=Venue, y=)) + 
+  geom_point()
+team_graph
 ```
 
 ### Second graph
@@ -61,9 +109,16 @@ dublin_gaa
 2. DUBLIN highlighted in dublin color
 3. according to wins/points scored?
 
-### Third Graph (3d)
-1. venue vs teams vs wins
-2. where do each team win the most
-3. Dublin, CROKE PARK highlighted in green
-4. Everyone else in orange
-5. star every outlier
+### Third Graph - interactive correlation plot
+1. 
+```{r}
+glimpse(main_data)
+# inorder to add the team_Outcome it needs to be numeric
+Team_stuff <- ggpairs(main_data,columns =6:11, aes(text=Team_Name))
+
+ggplotly(Team_stuff, tooltip= c("text", "x", "y")) %>% #what to show when hovering
+  highlight(on = "plotly_selected", off="plotly_deselect") #turns hovering on and off
+```
+
+Ask Team :
+-WHich venues should we use
