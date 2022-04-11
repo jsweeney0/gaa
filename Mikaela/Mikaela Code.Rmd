@@ -138,14 +138,13 @@ county_gaa3
 ```
 ### 2st graph : Jitter Graph
 -all venues with a select number of teams
-#cannot figure out how to colour it in
 ```{r}
-#ask team whichstadiu,s to use
-team_graph2 <- ggplot(county_gaa3, aes(x=Winner_Score, y=Venue))+
+#ask team whichstadiums to use
+team_graph2 <- ggplot(county_gaa3, aes(x=Winner_Score, y=Venue, color=Winner))+
   geom_jitter(width = .5, size=1) 
 team_graph2
 ```
-# 3rd graph
+# 3rd graph : Graph with 4 teams and 4 venues
 ```{r}
 team_graph3 <- ggplot(venue_gaa2) + 
   geom_point(aes(x= Winner,y=Winner_Score, col = Winner))+
@@ -154,6 +153,9 @@ team_graph3
 #Reduce this with venue
 ```
 
-
+Once approved with tidy up the graphs and put them into a big folder
+decide which graphs and then go in for the details
+-angling the names, labs and colours
+-want to try the hovering over a a point to show stadium and team
 Ask Team :
 -WHich venues should we use
