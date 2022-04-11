@@ -20,11 +20,6 @@ sum(is.na(gaa$Venue)|gaa$Venue == "")
 sum(is.na(gaa$Team_Outcome)|gaa$Team_Outcome == "UNKNOWN")
 #Venue is the only one with missing values
 ```
-## 
-```{r}
-df2<-df1[!(df1$Name=="George" | df1$Name=="Andrea"),]
-```
-
 
 ### Code for all teams we are looking at with all venues
 ```{r}
@@ -41,7 +36,7 @@ MAYO_gaa<- gaa %>%
   filter(Team_Name == "MAYO" |Opp_Name =="MAYO" )
 
 county_gaa1 <- rbind(DUBLIN_gaa,KERRY_gaa,CORK_gaa,MAYO_gaa) %>% 
-  subset (select = -c(Team_Outcome, Date, Game_Round))   #removes these things as do not plan to use them
+  subset (select = -c(Team_Outcome, Date, Game_Round,Team_Goals,Opp_Goals,Team_Points, Opp_Points))#removes these things as do not plan to use them
   
 county_gaa1 #with all extra teams
 
@@ -54,7 +49,7 @@ Kerry
 Mayo
 ```{r}
   
-county_gaa <- county_gaa1 %>%
+county_gaa2 <- county_gaa1 %>%
   mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
                             Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
                             Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
@@ -79,7 +74,7 @@ county_gaa <- county_gaa1 %>%
                             Opp_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
                             Opp_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE',
                             Team_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE'))
-county_gaa #all counties we are looking at 
+county_gaa2
 ```
 # Venues filter
 Venue == "CROKE PARK"
@@ -88,37 +83,63 @@ Venue == "MCHALE PARK"
 Venue == "FITZGERALD STADIUM"
 Base on Jades code
 ```{r}
-venue_gaa <- county_gaa %>% 
+venue_gaa1 <- county_gaa2 %>% 
   filter(Venue == c("CROKE PARK", "PARNELL PARK", "MCHALE PARK", "FITZGERALD STADIUM"))
-venue_gaa
 ```
-
-
-# Graphs
-### 1st graph : Scatterplot
--Points vs Venue, colour team
+### Creat a colume called Winner_score. Tie= Na
 ```{r}
 
-team_graph <- ggplot(venue_gaa , aes(x=Venue, y=)) + 
-  geom_point()
+venue_gaa2 <- venue_gaa1 %>% 
+  mutate(Winner_Score = case_when(
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ Team_Score,
+                            
+                            Opp_Name == "CORK" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "CORK" & Team_Score>Opp_Score  ~ Team_Score,
+                            
+                            Opp_Name == "KERRY" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "KERRY" & Team_Score>Opp_Score  ~ Team_Score,
+                            
+                            Opp_Name == "MAYO" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "MAYO" & Team_Score>Opp_Score  ~ Team_Score))
+
+# venue_gaa3[is.na(venue_gaa3)] = 0 #Lets na which are ties be 0
+```
+
+### 1st graph : Scatterplot
+-Winner Score vs Venue, colour team
+```{r}
+team_graph <- ggplot(venue_gaa3) + 
+  geom_point(aes(x=Venue, y=Winner_Score, col = Winner))
 team_graph
 ```
 
-### Second graph
-1. bar graph showing the way all teams has played in CROKE PARK
-2. DUBLIN highlighted in dublin color
-3. according to wins/points scored?
-
-### Third Graph - interactive correlation plot
-1. 
+### Option two no filter for venue 
 ```{r}
-glimpse(main_data)
-# inorder to add the team_Outcome it needs to be numeric
-Team_stuff <- ggpairs(main_data,columns =6:11, aes(text=Team_Name))
-
-ggplotly(Team_stuff, tooltip= c("text", "x", "y")) %>% #what to show when hovering
-  highlight(on = "plotly_selected", off="plotly_deselect") #turns hovering on and off
+county_gaa3 <- county_gaa2%>% 
+  mutate(Winner_Score = case_when(
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ Team_Score,
+                            
+                            Opp_Name == "CORK" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "CORK" & Team_Score>Opp_Score  ~ Team_Score,
+                            
+                            Opp_Name == "KERRY" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "KERRY" & Team_Score>Opp_Score  ~ Team_Score,
+                            
+                            Opp_Name == "MAYO" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "MAYO" & Team_Score>Opp_Score  ~ Team_Score))
+county_gaa3
 ```
+### 2st graph : Jitter Graph
+-all venues with a select number of teams
+#cannot figure out how to colour it in
+```{r}
+team_graph2 <- ggplot(county_gaa3, aes(x=Winner_Score, y=Venue),col= Winner)+
+  geom_jitter(width = .5, size=1) 
+team_graph2
+```
+
 
 Ask Team :
 -WHich venues should we use
