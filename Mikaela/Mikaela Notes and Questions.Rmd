@@ -1,0 +1,24 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## Venues
+-Venue == "CROKE PARK"
+-Venue == "PARNELL PARK"
+-Venue == "MCHALE PARK"
+-Venue == "FITZGERALD STADIUM"
+
+## Teams
+-Dublin
+-Cork
+-Kerry
+-Mayo
+
+## Notes
+Once approved, tidy up the graphs and put them into a big folder
+decide which graphs and then go in for the details
+-angling the names, labs and colours
+-want to try the hovering over a a point to show stadium and team
+Ask Team :
+-WHich venues should we use

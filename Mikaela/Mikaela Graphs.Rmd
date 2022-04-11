@@ -1,0 +1,67 @@
+---
+title: "Mikaela Example Graphs"
+author: "Mikaela Sminia 19250793"
+date: "4/11/2022"
+output: html_document
+---
+
+## 1st graph : Scatterplot 
+-4 venues 4 teams
+-Winner Score vs Venue, colour winner
+```{r}
+team_graph <- ggplot(venue_gaa2) + 
+  geom_point(aes(x=Venue, y=Winner_Score, col = Winner))
+team_graph
+```
+## 2nd graph : Scatter Facet wrap the venues
+-with 4 teams and 4 venues
+```{r}
+team_graph2 <- ggplot(venue_gaa2) + 
+  geom_point(aes(x= Winner,y=Winner_Score, col = Winner))+
+  facet_wrap(vars(Venue))
+team_graph2
+#Reduce this with venue
+```
+-most of dublins wins are in CROKE PARK even compared To PARNELL PARK
+
+## 3rd graph : Jitter Graph
+-all venues with a 4 teams
+```{r}
+#ask team whichstadiums to use
+team_graph3 <- ggplot(county_gaa3, aes(x=Winner_Score, y=Venue, color=Winner))+
+  geom_jitter(width = .5, size=1) 
+#interactive
+ggplotly(team_graph3)
+```
+```{r}
+#without other team or tie and and unkown variable for venue
+
+team_graph3_2 <- ggplot(county_gaa4, aes(x=Winner_Score, y=Venue, color=Winner))+
+  geom_jitter(width = .5, size=1) 
+#interactive
+ggplotly(team_graph3_2)
+```
+## Graph 4 Jitter Graph
+-4 Venues 4 teams
+-winner in my eyes
+```{r}
+team_graph4 <- ggplot(venue_gaa2, aes(x=Winner_Score, y=Venue, color=Winner))+
+  geom_jitter(width = .5, size=1) +
+team_graph4
+#Maybe add more venues
+```
+```{r}
+#different shapes
+
+team_graph4_2 <- ggplot(venue_gaa2, aes(x=Winner_Score, y=Venue, color=Winner, shape=Winner))+
+  geom_jitter(width = .5, size=1) 
+  
+team_graph4_2
+```
+
+```{r}
+#interactive plot
+team_graph4_3<- ggplotly(team_graph4_2, tooltip = c("x","y","colour")) #needs to be colour not color
+team_graph4_3
+```
+

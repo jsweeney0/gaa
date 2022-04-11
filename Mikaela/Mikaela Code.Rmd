@@ -9,6 +9,7 @@ librarys
 library("tidyverse")
 load("gaa.Rdata")
 library(scatterplot3d)
+library(plotly)
 ```
 
 # gaa data
@@ -108,14 +109,6 @@ venue_gaa2[is.na(venue_gaa2)] = 0 #Lets na which are ties be 0
 venue_gaa2
 ```
 
-### 1st graph : Scatterplot
--Winner Score vs Venue, colour team
-```{r}
-team_graph <- ggplot(venue_gaa2) + 
-  geom_point(aes(x=Venue, y=Winner_Score, col = Winner))
-team_graph
-```
--most of dublins wins are in CROKE PARK even compared To PARNELL PARK
 
 ### Option two no filter for venue 
 ```{r}
@@ -136,26 +129,15 @@ county_gaa3 <- county_gaa2%>%
 county_gaa3[is.na(county_gaa3)] = 0 #Lets na which are ties be 0
 county_gaa3
 ```
-### 2st graph : Jitter Graph
--all venues with a select number of teams
+# Remove the "OTHER TEAM and TIE" variables with all venues
 ```{r}
-#ask team whichstadiums to use
-team_graph2 <- ggplot(county_gaa3, aes(x=Winner_Score, y=Venue, color=Winner))+
-  geom_jitter(width = .5, size=1) 
-team_graph2
+g <- subset(county_gaa3, Winner != "OTHER TEAM")
+county_gaa4 <-subset(g, Winner != "TIE")
+county_gaa4
 ```
-# 3rd graph : Graph with 4 teams and 4 venues
+#Fill in the venue with UNKNOWN variable 
+-Other and Tie removed
 ```{r}
-team_graph3 <- ggplot(venue_gaa2) + 
-  geom_point(aes(x= Winner,y=Winner_Score, col = Winner))+
-  facet_wrap(vars(Venue))
-team_graph3
-#Reduce this with venue
+county_gaa4$Venue[county_gaa4$Venue==''] <- "UNKNOWN"
 ```
 
-Once approved with tidy up the graphs and put them into a big folder
-decide which graphs and then go in for the details
--angling the names, labs and colours
--want to try the hovering over a a point to show stadium and team
-Ask Team :
--WHich venues should we use
