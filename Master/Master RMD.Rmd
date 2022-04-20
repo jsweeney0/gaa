@@ -1,0 +1,204 @@
+---
+title: "Master RMD"
+author: "Jade Sweeney"
+date: "05/04/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(tsibble)
+library(ggfortify)
+library(grid)
+library(gridExtra)
+library(xlsx)
+library(readxl)
+library(ggalt)
+library(plotly)
+```
+
+# Data Cleaning and Prepping
+```{r, message = FALSE}
+load("gaa.Rdata")
+
+# These are the teams have played the highest number of matches in Croke Park.
+
+# Filter by all Divisiion 1 Dublin matches. Then create a new Winner column which uses the Scores to identify the winnner of the match. This shows whether our team in question won the match, the other team won or if it was a tie.
+dub_gaa <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% filter(Division == "1")%>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+# Filter by all Divisiion 1 Cork matches. Then create a new Winner column which uses the Scores to identify the winnner of the match. This shows whether our team in question won the match, the other team won or if it was a tie.
+cork_gaa <- gaa %>% filter(Opp_Name == "CORK" | Team_Name == "CORK") %>%  filter(Division == "1")%>%
+  mutate(Winner = case_when(Team_Name == "CORK" & Team_Score<Opp_Score ~ 'CORK',
+                            Team_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score<Opp_Score  ~ 'CORK',
+                            Opp_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE'))
+
+# Filter by all Divisiion 1 Mayo matches. Then create a new Winner column which uses the Scores to identify the winnner of the match. This shows whether our team in question won the match, the other team won or if it was a tie.
+mayo_gaa <- gaa %>% filter(Opp_Name == "MAYO" | Team_Name == "MAYO") %>%  filter(Division == "1")%>%
+  mutate(Winner = case_when(Team_Name == "MAYO" & Team_Score<Opp_Score ~ 'MAYO',
+                            Team_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score<Opp_Score  ~ 'MAYO',
+                            Opp_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE'))
+
+# Filter by all Divisiion 1 Kerry matches. Then create a new Winner column which uses the Scores to identify the winnner of the match. This shows whether our team in question won the match, the other team won or if it was a tie.
+kerry_gaa <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>%  filter(Division == "1")%>%
+  mutate(Winner = case_when(Team_Name == "KERRY" & Team_Score<Opp_Score ~ 'KERRY',
+                            Team_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score<Opp_Score  ~ 'KERRY',
+                            Opp_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE'))
+
+# There are multiple empty Venue variables so I export these datasets as excel files.
+write.xlsx(dub_gaa, file = "dub_gaa.xlsx",
+           sheetName = "GAA", append = FALSE)
+write.xlsx(kerry_gaa, file = "kerry_gaa.xlsx",
+           sheetName = "GAA", append = FALSE)
+write.xlsx(cork_gaa, file = "cork_gaa.xlsx",
+           sheetName = "GAA", append = FALSE)
+write.xlsx(mayo_gaa, file = "mayo_gaa.xlsx",
+           sheetName = "GAA", append = FALSE)
+```
+
+# Adding in the new variables
+```{r}
+# In Excel I added the missing information in the dataset and saved as new excel file. Then uploaded into R again.
+load("gaa.Rdata")
+cork_gaa <- read_excel("cork_gaa.xlsx")
+dub_gaa <- read_excel("dub_gaa.xlsx")
+kerry_gaa <- read_excel("kerry_gaa.xlsx")
+mayo_gaa <- read_excel("mayo_gaa.xlsx")
+
+
+# Filter the datasets by Croke Park
+dublin <- dub_gaa %>% filter(Venue == "CROKE PARK")
+cork <- cork_gaa %>% filter(Venue == "CROKE PARK")
+mayo <- mayo_gaa %>%  filter(Venue == "CROKE PARK") 
+kerry <- kerry_gaa %>% filter(Venue == "CROKE PARK") 
+
+# Bind these together into a new dataset
+new <- rbind(dublin,cork,kerry,mayo)
+
+# Barchart of the number of wins by each team at Croke Park
+new %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(colour = "gray40") + ylim(0,30) + labs(title = "Each Teams' Performance in Croke Park", x = NULL, y = "Number of Wins") 
+```
+
+# Barcharts
+
+```{r, message = FALSE}
+# Creating barcharts that show each team's performance in Croke Park, showing the number of wins.
+dub_plot <- dublin %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") +   ylim(0,30)  + labs(subtitle = "Dublin", x = NULL, y = "Number of Wins") +    scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
+
+mayo_plot <- mayo %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30)  + labs(subtitle = "Mayo", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#ff0000","green4","808080"))
+
+kerry_plot <- kerry %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30)  + labs(subtitle = "Kerry", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#ffff00","chartreuse4","808080"))
+
+cork_plot <- cork %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30)  + labs(subtitle = "Cork", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#ff0000","white","808080"))
+
+# The plots arranged as one large plot with one overall heading
+grid.arrange(dub_plot,mayo_plot,kerry_plot,cork_plot, ncol=2, nrow=2,
+     top = textGrob("Top 4 Teams' Performance in Croke Park",gp=gpar(fontsize=15,font=4)))
+```
+
+
+```{r, message = FALSE}
+# Now filtering the Dublin dataset to the top 4 venues Dublin has played in.
+dub_croke <- dub_gaa %>% filter(Venue == "CROKE PARK")
+dub_parnell <- dub_gaa %>% filter(Venue == "PARNELL PARK")
+dub_mchale <- dub_gaa %>% filter(Venue == "MCHALE PARK")
+dub_fitz <- dub_gaa %>% filter(Venue == "FITZGERALD STADIUM") 
+
+#  Creating barcharts that show Dublin's performance in each venue, showing the number of wins.
+croke_plot <- dub_croke %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30) + labs(subtitle = "Croke Park", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
+
+parnell_plot <- dub_parnell %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30) + labs(subtitle = "Parnell Park", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
+
+mchale_plot <- dub_mchale %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30) + labs(subtitle = "Mchale Park", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
+
+fitz_plot <- dub_fitz %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30) + labs(subtitle = "Fitzgerald Stadium", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
+
+# The plots arranged as one large plot with one overall heading
+grid.arrange(croke_plot,parnell_plot,mchale_plot,fitz_plot, ncol=2, nrow=2,
+     top = textGrob("Dublin's Wins Across Top 4 Stadiums",gp=gpar(fontsize=15,font=4)))
+```
+
+# Pie Charts
+```{r}
+# Creating pie charts that recreate the bar chart information
+dub_pie <- ggplot(data = dublin, aes(x=1,fill=Winner)) + geom_bar(position="fill", colour = "gray40") +
+  coord_polar(theta="y")  + labs(subtitle = "Dublin", x = NULL, y = NULL) + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) + theme_void()
+
+mayo_pie <- ggplot(data = mayo, aes(x=1,fill=Winner)) + geom_bar(position="fill", colour = "gray40") +
+  coord_polar(theta="y")  + labs(subtitle = "Mayo", x = NULL, y = NULL) + scale_fill_manual(values=c("#ff0000","green4","808080"))+ theme_void()
+
+kerry_pie <- ggplot(data = kerry, aes(x=1,fill=Winner)) + geom_bar(position="fill", colour = "gray40") +
+  coord_polar(theta="y")   + labs(subtitle = "Kerry", x = NULL, y = NULL) + scale_fill_manual(values=c("#ffff00","chartreuse4","808080"))+ theme_void()
+
+cork_pie <- ggplot(data = cork, aes(x=1,fill=Winner)) + geom_bar(position="fill", colour = "gray40") +
+  coord_polar(theta="y")   + labs(subtitle = "Cork", x = NULL, y = NULL) + scale_fill_manual(values=c("#ff0000","white","808080"))+ theme_void()
+
+grid.arrange(dub_pie,mayo_pie,kerry_pie,cork_pie, ncol=2, nrow=2,
+     top = textGrob("Top 4 Teams' Performance in Croke Park",gp=gpar(fontsize=15,font=4)))
+```
+
+```{r}
+# Creating pie charts that repeat the barchart information
+fitz_pie <- ggplot(data = dub_fitz, aes(x=1,fill=Winner)) + geom_bar(position="fill", colour = "gray40") +
+  coord_polar(theta="y")  + labs(subtitle = "Fitzgerald Stadium", x = NULL, y = NULL) + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) + theme_void()
+
+croke_pie <- ggplot(data = dub_croke, aes(x=1,fill=Winner)) + geom_bar(position="fill", colour = "gray40") +
+  coord_polar(theta="y")  + labs(subtitle = "Croke Park", x = NULL, y = NULL) + scale_fill_manual(values=c("#88b8fd","dark blue","808080"))+ theme_void()
+
+parnell_pie <- ggplot(data = dub_parnell, aes(x=1,fill=Winner)) + geom_bar(position="fill", colour = "gray40") +
+  coord_polar(theta="y")   + labs(subtitle = "Parnell Park", x = NULL, y = NULL) + scale_fill_manual(values=c("#88b8fd","dark blue","808080"))+ theme_void()
+
+mchale_pie <- ggplot(data = dub_mchale, aes(x=1,fill=Winner),) + geom_bar(position="fill", colour = "gray40")+ coord_polar(theta="y")   + labs(subtitle = "McHale Park", x = NULL, y = NULL) + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) + theme_void()
+
+grid.arrange(croke_pie,parnell_pie,mchale_pie,fitz_pie, ncol=2, nrow=2,
+     top = textGrob("Dublin's Wins Across Top 4 Stadiums",gp=gpar(fontsize=15,font=4)))
+```
+
+# Interactive Scatter Plot
+```{r}
+# Remove variables that are not needed
+new1 <- new %>% 
+  subset (select = -c(Team_Outcome, Date, Game_Round,Team_Goals,Opp_Goals,Team_Points, Opp_Points))
+
+# A new dataset of the Croke Park variable, that gives the Winner Score
+gaa_croke <- new1 %>% 
+  mutate(Winner_Score = case_when(
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ Team_Score,
+                            
+                            Opp_Name == "CORK" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "CORK" & Team_Score>Opp_Score  ~ Team_Score,
+                            
+                            Opp_Name == "KERRY" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "KERRY" & Team_Score>Opp_Score  ~ Team_Score,
+                            
+                            Opp_Name == "MAYO" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "MAYO" & Team_Score>Opp_Score  ~ Team_Score))
+
+# Remove variables where there is a tie, where there are NA's and include only the relevant winning teams.
+gaa_croke[is.na(gaa_croke)] = 0
+gaa_croke <- gaa_croke[gaa_croke$Winner_Score !=0,]
+gaa_croke <- gaa_croke %>% filter(Winner != "OTHER TEAM")
+
+# Create a plot that shows the score of each of the winning teams and make it interactive.
+plot <- ggplot(gaa_croke, aes(x= Winner_Score, y = Winner, color = Winner)) + geom_jitter(width = 0.5, size = 2.5) + labs(title = "Points Scored by the Winning Team in Croke Park", subtitle = "The Winning Score of each Team in Croke Park", y = NULL, x = "Score")
+ggplotly(plot, tooltip = c("x","y","colour"))
+
+```
+
