@@ -21,13 +21,91 @@ library(ggalt)
 library(plotly)
 ```
 
-## What is the impact of Croke Park on Dublin's match performance? {.tabset}
+## An Analysis of the Performance of the Dublin Gaelic Football Team from 2001 – 2017 {.tabset}
 
 ### Introduction
-describes the data and your question of interest.
+The data set used to conduct this analysis is the “GAA” data set comprising of data related to 1994 National Football League (NFL) games which occurred from 2001 to 2017. The NFL is an annual Gaelic football competition which is contested by the senior county teams. The teams are divided into four divisions with team ability decreasing with the division numbers. The teams initially play each other once receiving league points for each win. Towards the end of the competition the top ranked teams play each other in the knockout stages to determine the overall winner. 
+
+Each game was described in the data using 13 variables initially. These variables contained data describing the teams playing (Team_Name and Opp_Name), the date of the game (Date), the round of the competition (Game_Round), the outcome for the team named in the Team_Name variable (Team_Outcome, the goals, points and total score of each team (Team_Points, Team_Goals, Team_Score, Opp_Points, Opp_Goals and Opp_Score), the venue the match took place in (Venue) and which division the match took place in (Division). 
+
+Our question of interest is “does Croke Park have an impact on the Dublin Gaelic football team’s performance”. This is a topic of interest in contemporary Irish sport arising in part due to the dominance of the Dublin team in recent years. Croke Park is a stadium and headquarters of the Gaelic Athletic Association (GAA) and is where the most important games are held. It is situated in Dublin and thus the Dublin team and as their fans do not have to travel to another county for many of their games in contrast to every other county team. Many pundits argue that this gives Dublin a home advantage in these games although Parnell Park (another stadium in Dublin) is Dublin’s actual home stadium while Croke Park is considered de jure to be a neutral ground. 
+
+To answer this question the data was adjusted to make it suitable for analysis, the findings of said analysis will be presented in various visualisations and a conclusion will then be drawn based on these. 
 
 ### Data adjustments
-calculations necessary to put data into appropriate shape for analysis, if any
+```{r, message = FALSE}
+load("gaa.Rdata")
+
+# These are the teams have played the highest number of matches in Croke Park.
+
+# Filter by all Divisiion 1 Dublin matches. Then create a new Winner column which uses the Scores to identify the winnner of the match. This shows whether our team in question won the match, the other team won or if it was a tie.
+dub_gaa <- gaa %>% filter(Opp_Name == "DUBLIN" | Team_Name == "DUBLIN") %>% filter(Division == "1")%>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+# Filter by all Divisiion 1 Cork matches. Then create a new Winner column which uses the Scores to identify the winnner of the match. This shows whether our team in question won the match, the other team won or if it was a tie.
+cork_gaa <- gaa %>% filter(Opp_Name == "CORK" | Team_Name == "CORK") %>%  filter(Division == "1")%>%
+  mutate(Winner = case_when(Team_Name == "CORK" & Team_Score<Opp_Score ~ 'CORK',
+                            Team_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score<Opp_Score  ~ 'CORK',
+                            Opp_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE'))
+
+# Filter by all Divisiion 1 Mayo matches. Then create a new Winner column which uses the Scores to identify the winnner of the match. This shows whether our team in question won the match, the other team won or if it was a tie.
+mayo_gaa <- gaa %>% filter(Opp_Name == "MAYO" | Team_Name == "MAYO") %>%  filter(Division == "1")%>%
+  mutate(Winner = case_when(Team_Name == "MAYO" & Team_Score<Opp_Score ~ 'MAYO',
+                            Team_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score<Opp_Score  ~ 'MAYO',
+                            Opp_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE'))
+
+# Filter by all Divisiion 1 Kerry matches. Then create a new Winner column which uses the Scores to identify the winnner of the match. This shows whether our team in question won the match, the other team won or if it was a tie.
+kerry_gaa <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>%  filter(Division == "1")%>%
+  mutate(Winner = case_when(Team_Name == "KERRY" & Team_Score<Opp_Score ~ 'KERRY',
+                            Team_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score<Opp_Score  ~ 'KERRY',
+                            Opp_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE'))
+
+# There are multiple empty Venue variables so I export these datasets as excel files.
+write.xlsx(dub_gaa, file = "dub_gaa.xlsx",
+           sheetName = "GAA", append = FALSE)
+write.xlsx(kerry_gaa, file = "kerry_gaa.xlsx",
+           sheetName = "GAA", append = FALSE)
+write.xlsx(cork_gaa, file = "cork_gaa.xlsx",
+           sheetName = "GAA", append = FALSE)
+write.xlsx(mayo_gaa, file = "mayo_gaa.xlsx",
+           sheetName = "GAA", append = FALSE)
+```
+
+```{r, message = FALSE}
+
+# Adding in the new variables
+
+# In Excel I added the missing information in the dataset and saved as new excel file. Then uploaded into R again.
+load("gaa.Rdata")
+cork_gaa <- read_excel("cork_gaa.xlsx")
+dub_gaa <- read_excel("dub_gaa.xlsx")
+kerry_gaa <- read_excel("kerry_gaa.xlsx")
+mayo_gaa <- read_excel("mayo_gaa.xlsx")
+
+
+# Filter the datasets by Croke Park
+dublin <- dub_gaa %>% filter(Venue == "CROKE PARK")
+cork <- cork_gaa %>% filter(Venue == "CROKE PARK")
+mayo <- mayo_gaa %>%  filter(Venue == "CROKE PARK") 
+kerry <- kerry_gaa %>% filter(Venue == "CROKE PARK") 
+
+# Bind these together into a new dataset
+new <- rbind(dublin,cork,kerry,mayo)
+```
 
 ### Analysis
 section with up to four plots. Each plot should be accompanied by a paragraph explaining the graphic and what you learned from it.
@@ -36,5 +114,13 @@ section with up to four plots. Each plot should be accompanied by a paragraph ex
 a concluding paragraph summarising your finds.
 
 ### Responsibilities
-Each person in the group should complete a statement such as “I, (fill in your name), had primary responsibility for the material in (fill in the relevant section).
+I, Con Anthony Mc Cord had primary responsibility for the material in XXXXX. 
+
+I, Jade Eve Sweeney had primary responsibility for the material in XXXXX. 
+
+I, Mikaela Jaya Sminia had primary responsibility for the material in XXXXX. 
+
+ 
+
+Although each team member had a section for which they were primarily responsible the input of each team member was invaluable for each one of us in completing our individual sections. This report required the skills of each team member in its completion.  
 
