@@ -120,6 +120,8 @@ dub_parnell <- dub_gaa %>% filter(Venue == "PARNELL PARK")
 dub_mchale <- dub_gaa %>% filter(Venue == "MCHALE PARK")
 dub_fitz <- dub_gaa %>% filter(Venue == "FITZGERALD STADIUM") 
 
+dubnew <- rbind(dub_croke,dub_fitz,dub_mchale,dub_parnell)
+
 #  Creating barcharts that show Dublin's performance in each venue, showing the number of wins.
 croke_plot <- dub_croke %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30) + labs(subtitle = "Croke Park", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
 
@@ -171,7 +173,15 @@ grid.arrange(croke_pie,parnell_pie,mchale_pie,fitz_pie, ncol=2, nrow=2,
 ```
 
 # Interactive Scatter Plot
-```{r}
+```{r,fig.dim = c(10, 6)}
+
+# Creates titles for the subplot
+a <- list(text = "Points Scored by Dublin in Top Venues",xref = "paper",yref = "paper",
+  yanchor = "bottom",xanchor = "center", align = "center", x = 0.5,y = 1,showarrow = FALSE)
+
+b <- list(text = "Points Scored by Winners in Croke Park",xref = "paper", yref = "paper",
+  yanchor = "bottom",xanchor = "center",align = "center",x = 0.5, y = 1,showarrow = FALSE)
+
 # Remove variables that are not needed
 new1 <- new %>% 
   subset (select = -c(Team_Outcome, Date, Game_Round,Team_Goals,Opp_Goals,Team_Points, Opp_Points))
@@ -197,8 +207,31 @@ gaa_croke <- gaa_croke[gaa_croke$Winner_Score !=0,]
 gaa_croke <- gaa_croke %>% filter(Winner != "OTHER TEAM")
 
 # Create a plot that shows the score of each of the winning teams and make it interactive.
-plot <- ggplot(gaa_croke, aes(x= Winner_Score, y = Winner, color = Winner)) + geom_jitter(width = 0.5, size = 2.5) + labs(title = "Points Scored by the Winning Team in Croke Park", subtitle = "The Winning Score of each Team in Croke Park", y = NULL, x = "Score")
-ggplotly(plot, tooltip = c("x","y","colour"))
+plot <- ggplot(gaa_croke, aes(x= Winner_Score, y = Winner, color = Winner)) + geom_jitter(width = 0.5, size = 2.5) + labs(y = NULL, x = "Score") + scale_colour_brewer(palette = "Set2") +theme(legend.position="none")
+croke_plot <- ggplotly(plot, tooltip = c("x","y","colour")) %>%
+  layout(annotations = b)
+
+#########
+# Same steps as previous but using Dublin games in its top 4 venues
+dubnew1 <- dubnew %>% 
+  subset (select = -c(Team_Outcome, Date, Game_Round,Team_Goals,Opp_Goals,Team_Points, Opp_Points))
+
+gaa_dublin <- dubnew1 %>% 
+  mutate(Winner_Score = case_when(
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ Team_Score))
+
+gaa_dublin[is.na(gaa_dublin)] = 0
+gaa_dublin <- gaa_dublin[gaa_dublin$Winner_Score !=0,]
+gaa_dublin <- gaa_dublin %>% filter(Winner != "OTHER TEAM")
+
+
+plot2 <- ggplot(gaa_dublin, aes(x= Winner_Score, y = Venue, color = Venue)) + geom_jitter(width = 0.5, size = 2.5) + labs(y = NULL, x = "Score") + scale_colour_brewer(palette = "Set3") + theme(legend.position="none")
+dub_plot <- ggplotly(plot2, tooltip = c("x","y","colour")) %>%
+  layout(annotations = a)
+
+# Combine both plots together
+subplot(dub_plot,croke_plot, nrows=1, margin = 0.05, titleX = TRUE, titleY = TRUE)
 
 ```
 
