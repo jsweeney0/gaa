@@ -1,0 +1,40 @@
+---
+title: "ST302 Project"
+author: "Mikaela Sminia, Con McCord and Jade Sweeney"
+date: "29/04/22"
+output:
+  html_document:
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(tsibble)
+library(ggfortify)
+library(grid)
+library(gridExtra)
+library(xlsx)
+library(readxl)
+library(ggalt)
+library(plotly)
+```
+
+## What is the impact of Croke Park on Dublin's match performance? {.tabset}
+
+### Introduction
+describes the data and your question of interest.
+
+### Data adjustments
+calculations necessary to put data into appropriate shape for analysis, if any
+
+### Analysis
+section with up to four plots. Each plot should be accompanied by a paragraph explaining the graphic and what you learned from it.
+
+### Conclusion
+a concluding paragraph summarising your finds.
+
+### Responsibilities
+Each person in the group should complete a statement such as “I, (fill in your name), had primary responsibility for the material in (fill in the relevant section).
+
