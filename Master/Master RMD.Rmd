@@ -61,7 +61,7 @@ kerry_gaa <- gaa %>% filter(Opp_Name == "KERRY" | Team_Name == "KERRY") %>%  fil
                             Opp_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE',
                             Team_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE'))
 
-# There are multiple empty Venue variables so I export these datasets as excel files.
+# There are multiple empty Venue variables so export these datasets as excel files.
 write.xlsx(dub_gaa, file = "dub_gaa.xlsx",
            sheetName = "GAA", append = FALSE)
 write.xlsx(kerry_gaa, file = "kerry_gaa.xlsx",
@@ -74,7 +74,7 @@ write.xlsx(mayo_gaa, file = "mayo_gaa.xlsx",
 
 # Adding in the new variables
 ```{r}
-# In Excel I added the missing information in the dataset and saved as new excel file. Then uploaded into R again.
+# In Excel added the missing information in the dataset and saved as new excel file. Then uploaded into R again.
 load("gaa.Rdata")
 cork_gaa <- read_excel("cork_gaa.xlsx")
 dub_gaa <- read_excel("dub_gaa.xlsx")
@@ -98,6 +98,7 @@ new %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(colour = "gray40") + ylim(
 # Barcharts
 
 ```{r, message = FALSE}
+
 # Creating barcharts that show each team's performance in Croke Park, showing the number of wins.
 dub_plot <- dublin %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") +   ylim(0,30)  + labs(subtitle = "Dublin", x = NULL, y = "Number of Wins") +    scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
 
@@ -174,9 +175,8 @@ grid.arrange(croke_pie,parnell_pie,mchale_pie,fitz_pie, ncol=2, nrow=2,
 
 # Interactive Scatter Plot
 ```{r,fig.dim = c(10, 6)}
-
 # Creates titles for the subplot
-a <- list(text = "Points Scored by Dublin in Top Venues",xref = "paper",yref = "paper",
+a <- list(text = "Winning Points Scored by Dublin in Top Venues",xref = "paper",yref = "paper",
   yanchor = "bottom",xanchor = "center", align = "center", x = 0.5,y = 1,showarrow = FALSE)
 
 b <- list(text = "Points Scored by Winners in Croke Park",xref = "paper", yref = "paper",
@@ -184,7 +184,7 @@ b <- list(text = "Points Scored by Winners in Croke Park",xref = "paper", yref =
 
 # Remove variables that are not needed
 new1 <- new %>% 
-  subset (select = -c(Team_Outcome, Date, Game_Round,Team_Goals,Opp_Goals,Team_Points, Opp_Points))
+  subset (select = -c(Team_Outcome, Date, Game_Round,Team_Goals,Opp_Goals,Team_Points, Opp_Points, Division))
 
 # A new dataset of the Croke Park variable, that gives the Winner Score
 gaa_croke <- new1 %>% 
@@ -207,31 +207,41 @@ gaa_croke <- gaa_croke[gaa_croke$Winner_Score !=0,]
 gaa_croke <- gaa_croke %>% filter(Winner != "OTHER TEAM")
 
 # Create a plot that shows the score of each of the winning teams and make it interactive.
-plot <- ggplot(gaa_croke, aes(x= Winner_Score, y = Winner, color = Winner)) + geom_jitter(width = 0.5, size = 2.5) + labs(y = NULL, x = "Score") + scale_colour_brewer(palette = "Set2") +theme(legend.position="none")
-croke_plot <- ggplotly(plot, tooltip = c("x","y","colour")) %>%
+plot <- ggplot(gaa_croke, aes(x= Winner_Score, y = Winner, color = Winner, shape= Winner)) + 
+  geom_jitter(width = 0.5, size = 2.5) + 
+  labs(y = NULL, x = "Score") + 
+  scale_colour_brewer(palette = "Dark2") + ##changed it to dark to make a better contrast
+  scale_shape_manual(values = c("DUBLIN" = 16, "CORK" = 15, "KERRY" =17, "MAYO" =18 )) + ##add shape 
+  theme(legend.position="none")
+croke_plot <- ggplotly(plot, tooltip = c("x","y")) %>%
   layout(annotations = b)
+
+
 
 #########
 # Same steps as previous but using Dublin games in its top 4 venues
 dubnew1 <- dubnew %>% 
-  subset (select = -c(Team_Outcome, Date, Game_Round,Team_Goals,Opp_Goals,Team_Points, Opp_Points))
+  subset (select = -c(Team_Outcome, Date, Game_Round,Team_Goals,Opp_Goals,Team_Points, Opp_Points,Division))
 
 gaa_dublin <- dubnew1 %>% 
-  mutate(Winner_Score = case_when(
+  mutate(Dublin_Score = case_when(
                             Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ Opp_Score,
-                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ Team_Score))
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ Team_Score)) #Changed Winner_Score to Dublin_Score For thr dublin plot
 
 gaa_dublin[is.na(gaa_dublin)] = 0
-gaa_dublin <- gaa_dublin[gaa_dublin$Winner_Score !=0,]
+gaa_dublin <- gaa_dublin[gaa_dublin$Dublin_Score !=0,]
 gaa_dublin <- gaa_dublin %>% filter(Winner != "OTHER TEAM")
 
 
-plot2 <- ggplot(gaa_dublin, aes(x= Winner_Score, y = Venue, color = Venue)) + geom_jitter(width = 0.5, size = 2.5) + labs(y = NULL, x = "Score") + scale_colour_brewer(palette = "Set3") + theme(legend.position="none")
-dub_plot <- ggplotly(plot2, tooltip = c("x","y","colour")) %>%
-  layout(annotations = a)
+plot2 <- ggplot(gaa_dublin, aes(x= Dublin_Score, y = Venue, color = Venue)) + 
+  geom_jitter(width = 0.5, size = 2.5) + 
+  labs(y = NULL, x = "Score") + 
+  scale_colour_brewer(palette = "Accent") + ##changed colour cause too close to the team plot colours
+  theme(legend.position="none")  
+dub_plot <- ggplotly(plot2, tooltip = c("x","y")) %>%
+  layout(annotations = a) ###Removed the colour variable cause it is a repeat
 
 # Combine both plots together
-subplot(dub_plot,croke_plot, nrows=1, margin = 0.05, titleX = TRUE, titleY = TRUE)
-
+subplot(dub_plot, croke_plot, nrows=1, margin = 0.05, titleX = TRUE, titleY = TRUE)
 ```
 
