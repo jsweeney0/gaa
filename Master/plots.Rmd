@@ -1,0 +1,215 @@
+---
+title: "Plots"
+author: "Jade Sweeney"
+date: "20/04/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(tsibble)
+library(ggfortify)
+library(grid)
+library(gridExtra)
+library(readxl)
+library(ggalt)
+library(plotly)
+load("gaa.Rdata")
+cork_gaa <- read_excel("cork_gaa.xlsx")
+dub_gaa <- read_excel("dub_gaa.xlsx")
+kerry_gaa <- read_excel("kerry_gaa.xlsx")
+mayo_gaa <- read_excel("mayo_gaa.xlsx")
+```
+  
+
+```{r, echo = FALSE,fig.dim = c(10, 6)}
+# Load in the gaa excel files ( which have the added venue variables)
+
+dublin <- dub_gaa %>% filter(Venue == "CROKE PARK") %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+cork <- cork_gaa %>% filter(Venue == "CROKE PARK") %>%
+  mutate(Winner = case_when(Team_Name == "CORK" & Team_Score<Opp_Score ~ 'CORK',
+                            Team_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score<Opp_Score  ~ 'CORK',
+                            Opp_Name == "CORK" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "CORK" & Team_Score==Opp_Score  ~ 'TIE'))
+
+mayo <- mayo_gaa %>%  filter(Venue == "CROKE PARK")  %>%
+  mutate(Winner = case_when(Team_Name == "MAYO" & Team_Score<Opp_Score ~ 'MAYO',
+                            Team_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score<Opp_Score  ~ 'MAYO',
+                            Opp_Name == "MAYO" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "MAYO" & Team_Score==Opp_Score  ~ 'TIE'))
+
+ 
+kerry <- kerry_gaa %>% filter(Venue == "CROKE PARK") %>%
+  mutate(Winner = case_when(Team_Name == "KERRY" & Team_Score<Opp_Score ~ 'KERRY',
+                            Team_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score<Opp_Score  ~ 'KERRY',
+                            Opp_Name == "KERRY" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "KERRY" & Team_Score==Opp_Score  ~ 'TIE'))
+
+new <- rbind(dublin,cork,kerry,mayo)
+
+```
+
+  
+This next plot shows the top 4 teams and their performance at Croke Park. We can clearly see that Dublin plays in Croke Park at a much higher frequency, does this give them an advantage in and of itself? We can also clearly see that Dublin's win to loss ratio is much much higher than the other 4 teams.   
+
+```{r, echo = FALSE,fig.dim = c(10, 6)}
+
+dub_plot <- dublin %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30)  + labs(subtitle = "Dublin", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) 
+
+mayo_plot <- mayo %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30)  + labs(subtitle = "Mayo", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#ff0000","green4","808080"))
+
+kerry_plot <- kerry %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30)  + labs(subtitle = "Kerry", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#ffff00","chartreuse4","808080"))
+
+cork_plot <- cork %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend = FALSE, colour = "gray40") + ylim(0,30)  + labs(subtitle = "Cork", x = NULL, y = "Number of Wins") + scale_fill_manual(values=c("#ff0000","white","808080"))
+
+grid.arrange(dub_plot,mayo_plot,kerry_plot,cork_plot, ncol=2, nrow=2,
+     top = textGrob("Top 4 Teams' Performance in Croke Park",gp=gpar(fontsize=15,font=4)))
+```
+  
+  
+This next plot shows Dublin's performance in its most played stadiums. Again we see that Dublin has played in Croke Park very frequently and again its win to loss ratio is much higher in Croke Park than in other stadiums.  
+
+```{r,echo = FALSE,fig.dim = c(10, 6)}
+dub_croke <- dub_gaa %>% filter(Venue == "CROKE PARK") %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+dub_parnell <- dub_gaa %>% filter(Venue == "PARNELL PARK") %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+dub_mchale <- dub_gaa %>% filter(Venue == "MCHALE PARK") %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+dub_fitz <- dub_gaa %>% filter(Venue == "FITZGERALD STADIUM") %>%
+  mutate(Winner = case_when(Team_Name == "DUBLIN" & Team_Score<Opp_Score ~ 'DUBLIN',
+                            Team_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ 'DUBLIN',
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ 'OTHER TEAM',
+                            Opp_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE',
+                            Team_Name == "DUBLIN" & Team_Score==Opp_Score  ~ 'TIE'))
+
+dubnew <- rbind(dub_croke,dub_fitz,dub_mchale,dub_parnell)
+
+```
+
+These next plots repeat the same information, except this time in pie chart form. This shows the porportion of wins instead of the number. It shows that Dublin is the 2nd most wins with this, with Cork having a higher percentage of wins in Croke Park.  The next plot strongly highlights that Dublin has the highest percentage of wins in Croke Park than in any other stadium.
+
+```{r, echo = FALSE,fig.dim = c(10, 6)}
+
+fitz_pie <- ggplot(data = dub_fitz, aes(x=1,fill=Winner)) + geom_bar(position="fill", colour = "gray40") +
+  coord_polar(theta="y")  + labs(subtitle = "Fitzgerald Stadium", x = NULL, y = NULL) + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) + theme_void()
+
+croke_pie <- ggplot(data = dub_croke, aes(x=1,fill=Winner)) + geom_bar(position="fill", colour = "gray40") +
+  coord_polar(theta="y")  + labs(subtitle = "Croke Park", x = NULL, y = NULL) + scale_fill_manual(values=c("#88b8fd","dark blue","808080"))+ theme_void()
+
+parnell_pie <- ggplot(data = dub_parnell, aes(x=1,fill=Winner)) + geom_bar(position="fill", colour = "gray40") +
+  coord_polar(theta="y")   + labs(subtitle = "Parnell Park", x = NULL, y = NULL) + scale_fill_manual(values=c("#88b8fd","dark blue","808080"))+ theme_void()
+
+mchale_pie <- ggplot(data = dub_mchale, aes(x=1,fill=Winner),) + geom_bar(position="fill", colour = "gray40")+ coord_polar(theta="y")   + labs(subtitle = "McHale Park", x = NULL, y = NULL) + scale_fill_manual(values=c("#88b8fd","dark blue","808080")) + theme_void()
+
+grid.arrange(croke_pie,parnell_pie,mchale_pie,fitz_pie, ncol=2, nrow=2,
+     top = textGrob("Dublin's Wins Across Top 4 Stadiums",gp=gpar(fontsize=15,font=4)))
+
+```
+
+This interactive plot highlights the winning team scores across all their matches they won in Croke Park, and Dublin's scores in their top played venues. It shows that Dublin actually has scored the highest pointwise in their games in Croke Park, both against the other teams who have played in Croke Park and against the other venues they have played. This again shows that Dublin does play better in Croke Park than in other venues.
+
+```{r, echo = FALSE,fig.dim = c(10, 6)}
+# Creates titles for the subplot
+a <- list(text = "Winning Points Scored by Dublin in Top Venues",xref = "paper",yref = "paper",
+  yanchor = "bottom",xanchor = "center", align = "center", x = 0.5,y = 1,showarrow = FALSE)
+
+b <- list(text = "Points Scored by Winners in Croke Park",xref = "paper", yref = "paper",
+  yanchor = "bottom",xanchor = "center",align = "center",x = 0.5, y = 1,showarrow = FALSE)
+
+# Remove variables that are not needed
+new1 <- new %>% 
+  subset (select = -c(Team_Outcome, Date, Game_Round,Team_Goals,Opp_Goals,Team_Points, Opp_Points, Division))
+
+# A new dataset of the Croke Park variable, that gives the Winner Score
+gaa_croke <- new1 %>% 
+  mutate(Winner_Score = case_when(
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ Team_Score,
+                            
+                            Opp_Name == "CORK" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "CORK" & Team_Score>Opp_Score  ~ Team_Score,
+                            
+                            Opp_Name == "KERRY" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "KERRY" & Team_Score>Opp_Score  ~ Team_Score,
+                            
+                            Opp_Name == "MAYO" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "MAYO" & Team_Score>Opp_Score  ~ Team_Score))
+
+# Remove variables where there is a tie, where there are NA's and include only the relevant winning teams.
+gaa_croke[is.na(gaa_croke)] = 0
+gaa_croke <- gaa_croke[gaa_croke$Winner_Score !=0,]
+gaa_croke <- gaa_croke %>% filter(Winner != "OTHER TEAM")
+
+# Create a plot that shows the score of each of the winning teams and make it interactive.
+plot <- ggplot(gaa_croke, aes(x= Winner_Score, y = Winner, color = Winner, shape= Winner)) + 
+  geom_jitter(width = 0.5, size = 2.5) + 
+  labs(y = NULL, x = "Score") + 
+  scale_colour_brewer(palette = "Dark2") + ##changed it to dark to make a better contrast
+  scale_shape_manual(values = c("DUBLIN" = 16, "CORK" = 15, "KERRY" =17, "MAYO" =18 )) + ##add shape 
+  theme(legend.position="none")
+croke_plot <- ggplotly(plot, tooltip = c("x","y")) %>%
+  layout(annotations = b)
+
+
+
+#########
+# Same steps as previous but using Dublin games in its top 4 venues
+dubnew1 <- dubnew %>% 
+  subset (select = -c(Team_Outcome, Date, Game_Round,Team_Goals,Opp_Goals,Team_Points, Opp_Points,Division))
+
+gaa_dublin <- dubnew1 %>% 
+  mutate(Dublin_Score = case_when(
+                            Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ Opp_Score,
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ Team_Score)) #Changed Winner_Score to Dublin_Score For thr dublin plot
+
+gaa_dublin[is.na(gaa_dublin)] = 0
+gaa_dublin <- gaa_dublin[gaa_dublin$Dublin_Score !=0,]
+gaa_dublin <- gaa_dublin %>% filter(Winner != "OTHER TEAM")
+
+
+plot2 <- ggplot(gaa_dublin, aes(x= Dublin_Score, y = Venue, color = Venue)) + 
+  geom_jitter(width = 0.5, size = 2.5) + 
+  labs(y = NULL, x = "Score") + 
+  scale_colour_brewer(palette = "Accent") + ##changed colour cause too close to the team plot colours
+  theme(legend.position="none")  
+dub_plot <- ggplotly(plot2, tooltip = c("x","y")) %>%
+  layout(annotations = a) ###Removed the colour variable cause it is a repeat
+
+# Combine both plots together
+subplot(dub_plot, croke_plot, nrows=1, margin = 0.05, titleX = TRUE, titleY = TRUE)
+```
