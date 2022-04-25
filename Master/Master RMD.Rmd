@@ -210,8 +210,8 @@ gaa_croke <- gaa_croke %>% filter(Winner != "OTHER TEAM")
 plot <- ggplot(gaa_croke, aes(x= Winner_Score, y = Winner, color = Winner, shape= Winner)) + 
   geom_jitter(width = 0.5, size = 2.5) + 
   labs(y = NULL, x = "Score") + 
-  scale_colour_brewer(palette = "Dark2") + ##changed it to dark to make a better contrast
-  scale_shape_manual(values = c("DUBLIN" = 16, "CORK" = 15, "KERRY" =17, "MAYO" =18 )) + ##add shape 
+  scale_colour_brewer(palette = "Dark2") + 
+  scale_shape_manual(values = c("DUBLIN" = 16, "CORK" = 15, "KERRY" =17, "MAYO" =18 )) +  
   theme(legend.position="none")
 croke_plot <- ggplotly(plot, tooltip = c("x","y")) %>%
   layout(annotations = b)
@@ -226,7 +226,7 @@ dubnew1 <- dubnew %>%
 gaa_dublin <- dubnew1 %>% 
   mutate(Dublin_Score = case_when(
                             Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ Opp_Score,
-                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ Team_Score)) #Changed Winner_Score to Dublin_Score For thr dublin plot
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ Team_Score)) 
 
 gaa_dublin[is.na(gaa_dublin)] = 0
 gaa_dublin <- gaa_dublin[gaa_dublin$Dublin_Score !=0,]
@@ -236,10 +236,10 @@ gaa_dublin <- gaa_dublin %>% filter(Winner != "OTHER TEAM")
 plot2 <- ggplot(gaa_dublin, aes(x= Dublin_Score, y = Venue, color = Venue)) + 
   geom_jitter(width = 0.5, size = 2.5) + 
   labs(y = NULL, x = "Score") + 
-  scale_colour_brewer(palette = "Accent") + ##changed colour cause too close to the team plot colours
+  scale_colour_brewer(palette = "Accent") + 
   theme(legend.position="none")  
 dub_plot <- ggplotly(plot2, tooltip = c("x","y")) %>%
-  layout(annotations = a) ###Removed the colour variable cause it is a repeat
+  layout(annotations = a) 
 
 # Combine both plots together
 subplot(dub_plot, croke_plot, nrows=1, margin = 0.05, titleX = TRUE, titleY = TRUE)
