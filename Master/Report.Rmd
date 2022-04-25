@@ -21,17 +21,17 @@ library(ggalt)
 library(plotly)
 ```
 
+# Impact of Croke Park on Dublin Gaelic Football team performance
+
 ## An Analysis of the Performance of the Dublin Gaelic Football Team from 2001 – 2017 {.tabset}
 
 ### Introduction
-The data set used to conduct this analysis is the “GAA” data set comprising of data related to 1994 National Football League (NFL) games which occurred from 2001 to 2017. The NFL is an annual Gaelic football competition which is contested by the senior county teams. The teams are divided into four divisions with team ability decreasing with the division numbers. The teams initially play each other once receiving league points for each win. Towards the end of the competition the top ranked teams play each other in the knockout stages to determine the overall winner. 
 
-Each game was described in the data using 13 variables initially. These variables contained data describing the teams playing (Team_Name and Opp_Name), the date of the game (Date), the round of the competition (Game_Round), the outcome for the team named in the Team_Name variable (Team_Outcome, the goals, points and total score of each team (Team_Points, Team_Goals, Team_Score, Opp_Points, Opp_Goals and Opp_Score), the venue the match took place in (Venue) and which division the match took place in (Division). 
+The complete data set used to conduct this analysis is the “GAA” data set comprising of data related to 1994 National Football League (NFL) games which occurred from 2001 to 2017. The NFL is an annual Gaelic football competition which is contested by the senior county teams. The teams are divided into four divisions with team ability decreasing with the division numbers. The teams initially play each other once receiving league points for each win. Towards the end of the competition the top ranked teams play each other in the knockout stages to determine the overall winner.
 
-Our question of interest is “does Croke Park have an impact on the Dublin Gaelic football team’s performance”. This is a topic of interest in contemporary Irish sport arising in part due to the dominance of the Dublin team in recent years. Croke Park is a stadium and headquarters of the Gaelic Athletic Association (GAA) and is where the most important games are held. It is situated in Dublin and thus the Dublin team and as their fans do not have to travel to another county for many of their games in contrast to every other county team. Many pundits argue that this gives Dublin a home advantage in these games although Parnell Park (another stadium in Dublin) is Dublin’s actual home stadium while Croke Park is considered de jure to be a neutral ground. 
+Each game was described in the data using 13 variables initially. These variables contained data describing the teams playing (Team_Name and Opp_Name), the date of the game (Date), the round of the competition (Game_Round), the outcome for the team named in the Team_Name variable (Team_Outcome, the goals, points and total score of each team (Team_Points, Team_Goals, Team_Score, Opp_Points, Opp_Goals and Opp_Score), the venue the match took place in (Venue) and which division the match took place in (Division).
 
-To answer this question the data was adjusted to make it suitable for analysis, the findings of said analysis will be presented in various visualisations and a conclusion will then be drawn based on these. 
-
+Our question of interest is the impact of Croke Park on Dublin Gaelic Football team performance. This is a relevant topic in contemporary Irish sport arising due to the dominance of the Dublin team in recent years. There is much debate in the GAA regrading whether Dublin has an advantage when playing games in Croke Park which is the venue in which most important games of a given season occur and is situated in Dublin. Therefore, Dublin will play their most important games in their home county in contrast to every other county team which will have to travel to Croke Park. Croke Park is the national stadium of Ireland
 ### Data adjustments
 ```{r, message = FALSE}
 load("gaa.Rdata")
