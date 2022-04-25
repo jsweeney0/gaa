@@ -211,7 +211,7 @@ plot <- ggplot(gaa_croke, aes(x= Winner_Score, y = Winner, color = Winner, shape
   geom_jitter(width = 0.5, size = 2.5) + 
   labs(y = NULL, x = "Score") + 
   scale_colour_brewer(palette = "Dark2") + 
-  scale_shape_manual(values = c("DUBLIN" = 16, "CORK" = 15, "KERRY" =17, "MAYO" =18 )) + ##add shape 
+  scale_shape_manual(values = c("DUBLIN" = 16, "CORK" = 15, "KERRY" =17, "MAYO" =18 )) +  
   theme(legend.position="none")
 croke_plot <- ggplotly(plot, tooltip = c("x","y")) %>%
   layout(annotations = b)
