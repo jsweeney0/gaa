@@ -27,13 +27,20 @@ library(plotly)
 
 The data set used to conduct this analysis is the “GAA” data set comprising of data related to 1994 National Football League (NFL) games which occurred from 2001 to 2017. The NFL is an annual Gaelic football competition which is contested by the senior county teams. The teams are divided into four divisions with team ability decreasing with the division numbers. The teams initially play each other once receiving league points for each win. Towards the end of the competition the top ranked teams play each other in the knockout stages to determine the overall winner. 
 
-Each game was described in the data using 13 variables initially. These variables contained data describing the teams playing (Team_Name and Opp_Name), the date of the game (Date), the round of the competition (Game_Round), the outcome for the team named in the Team_Name variable (Team_Outcome, the goals, points and total score of each team (Team_Points, Team_Goals, Team_Score, Opp_Points, Opp_Goals and Opp_Score), the venue the match took place in (Venue) and which division the match took place in (Division). 
+ 
 
-Our question of interest is “What Impact Does Croke Park Have on Dublin Gaelic Football Team Performance?”. This is a topic of interest in contemporary Irish sport arising in part due to the dominance of the Dublin team in recent years. Croke Park is a stadium and headquarters of the Gaelic Athletic Association (GAA) and is where the most important games are held. It is situated in Dublin and thus the Dublin team and as their fans do not have to travel to another county for many of their games in contrast to every other county team. Many pundits argue that this gives Dublin a home advantage in these games although Parnell Park (another stadium in Dublin) is Dublin’s actual home stadium while Croke Park is considered de jure to be a neutral ground. 
+Each game was described in the data using 13 variables initially. These variables contained data relating to the teams playing (Team_Name and Opp_Name), the date of the game (Date), the round of the competition (Game_Round), the outcome for the team named in the Team_Name variable (Team_Outcome, the goals, points and total score of each team (Team_Points, Team_Goals, Team_Score, Opp_Points, Opp_Goals and Opp_Score), the stadium the match took place in (Venue) and which division the match took place in (Division). 
 
-To answer this question the data was adjusted to make it suitable for analysis, the findings of said analysis will be presented in various visualisations and a conclusion will then be drawn based on these. 
+ 
+
+The question which is the focus of this report is “What Impact Does Croke Park Have on the Dublin Gaelic Football Team’s Performance?” This is a topic of interest in contemporary Irish sport arising due to the dominance of the Dublin team in recent years. Croke Park is a stadium and headquarters of the Gaelic Athletic Association (GAA) and is where the most important games are held. It is situated in Dublin and thus the Dublin team and their supporters do not have to travel to another county for many of their games and in particular the most important games of the season. This is in contrast to every other county team. Many pundits argue that this gives Dublin a home advantage in these games although Parnell Park (another stadium in Dublin) is Dublin’s actual home stadium while Croke Park is considered de jure to be a neutral ground. 
+
+ 
+
+To answer this question the data was adjusted to make it suitable for analysis, the findings of said analysis will be presented in various graphics and a conclusion will then be drawn based on these.
 
 ### Data adjustments
+
 ```{r, message = FALSE}
 load("gaa.Rdata")
 
@@ -108,8 +115,25 @@ kerry <- kerry_gaa %>% filter(Venue == "CROKE PARK")
 new <- rbind(dublin,cork,kerry,mayo)
 ```
 
+There were several alterations required to put the data into appropriate shape for analysis. After an initial examination three main issues were found, these were the presence of a large amount of irrelevant data unrelated to the question of this report, the significant amount of absent Venue and Team_Outcome values and the lack of a proper functional variable to describe the winner of the match. 
+
+
+To resolve the issue associated with the irrelevant data several new variables were created relating to the games played by Dublin in Croke Park and the stadiums of the other top GAA teams (Mayo, Cork, and Kerry). It was decided to compare the results of the top GAA teams to make the data easier to visualise. To create these new variables the “filter()” function was utilised and the data was filtered based on the team playing and the venue the match took place in. By this process new variables were created relating to the games played by each of the top four teams in each of their stadiums. 
+
+
+To resolve the issue associated with the absent Venue values research was conducted relating to the specific games which had missing data. An excel file was composed consisting of the missing venues associated with these games. The data in the excel file was then read into R using the “read_excel()” function and thus loaded into the data that was being analysed.  
+
+
+To resolve the issues associated with the absent Team_Outcome values and the lack of a functional variable to describe the winner of the match a combination of the “mutate()” and “case_when()” functions were used to create new variables which re-defined the match result based on whether the Dublin team’s score was greater than their opponents. There was no missing data relating to the scores of matches but there was relating to the match result. By creating a new variable showing the winner of the games in question and basing it on the complete numeric data in the Opp_Score and Team_Score columns the previously mentioned issues were resolved. 
+
+
+Once these alterations were completed, the data was then in the proper shape to visualise properly and thus answer the question this report is based on “What Impact Does Croke Park Have on Dublin Gaelic Football Team Performance?” 
+
 ### Analysis
-  
+
+
+This section is dedicated to analysis of plots describing the Dublin GAA football team’s performance.  The first plot is a graphic showing the performances of the top four GAA teams in Croke Park, the second plot is a graphic displaying the performances of Dublin in stadiums across Ireland and the third plot is an interactive graphic showing the points scored by the teams in winning matches in Croke Park and other stadiums.  
+
 
 ```{r,fig.dim = c(10, 6)}
 # Load in the gaa excel files ( which have the added venue variables)
@@ -151,8 +175,7 @@ new <- rbind(dublin,cork,kerry,mayo)
 
 ```
 
-  
-This next plot shows the top 4 teams and their performance at Croke Park. We can clearly see that Dublin plays in Croke Park at a much higher frequency, does this give them an advantage in and of itself? We can also clearly see that Dublin's win to loss ratio is much much higher than the other 4 teams.   
+
 
 ```{r,fig.dim = c(10, 6)}
 
@@ -167,9 +190,10 @@ cork_plot <- cork %>% ggplot(aes(Winner, fill = Winner)) + geom_bar(show.legend 
 grid.arrange(dub_plot,mayo_plot,kerry_plot,cork_plot, ncol=2, nrow=2,
      top = textGrob("Top 4 Teams' Performance in Croke Park",gp=gpar(fontsize=15,font=4)))
 ```
-  
-  
-This next plot shows Dublin's performance in its most played stadiums. Again we see that Dublin has played in Croke Park very frequently and again its win to loss ratio is much higher in Croke Park than in other stadiums.  
+
+
+This graphic shows a split bar chart with each one coloured based on the team’s county colours. It describes the wins, losses, and ties of that respective county. What was learned from this graphic is that Dublin plays more in Croke Park than the other top GAA teams, they also have more overall wins and a larger win ratio than the other top teams. It appears that playing in Croke Park has a positive impact on Dublin’s performance compared to the other top teams. 
+
 
 ```{r,echo = FALSE,fig.dim = c(10, 6)}
 dub_croke <- dub_gaa %>% filter(Venue == "CROKE PARK") %>%
@@ -208,7 +232,7 @@ dubnew <- rbind(dub_croke,dub_fitz,dub_mchale,dub_parnell)
 
 ```
 
-These next plots repeat the same information, except this time in pie chart form. This shows the porportion of wins instead of the number. It shows that Dublin is the 2nd most wins with this, with Cork having a higher percentage of wins in Croke Park.  The next plot strongly highlights that Dublin has the highest percentage of wins in Croke Park than in any other stadium.
+
 
 ```{r,fig.dim = c(10, 6)}
 
@@ -228,7 +252,9 @@ grid.arrange(croke_pie,parnell_pie,mchale_pie,fitz_pie, ncol=2, nrow=2,
 
 ```
 
-This interactive plot highlights the winning team scores across all their matches they won in Croke Park, and Dublin's scores in their top played venues. It shows that Dublin actually has scored the highest pointwise in their games in Croke Park, both against the other teams who have played in Croke Park and against the other venues they have played. This again shows that Dublin does play better in Croke Park than in other venues.
+
+This graphic shows a split pie chart depicting the proportion of Dublin wins across the stadiums they most frequently compete in. As this graphic only describes the performance of the Dublin team it is coloured based on their county colours. It is clear that Dublin has the highest proportion of wins in Croke Park compared to the other stadiums. For example, in Fitzgerald stadium Dublin only won one quarter of their matches compared to three quarters in Croke Park. Even compared to Parnell Park, which is another stadium in Dublin, Dublin still has a significantly higher win rate in Croke Park. This re-iterates the previous findings that Croke Park has a positive impact on Dublin’s performance compared to other stadiums and even their actual home stadium. 
+
 
 ```{r,fig.dim = c(10, 6)}
 # Creates titles for the subplot
@@ -266,8 +292,8 @@ gaa_croke <- gaa_croke %>% filter(Winner != "OTHER TEAM")
 plot <- ggplot(gaa_croke, aes(x= Winner_Score, y = Winner, color = Winner, shape= Winner)) + 
   geom_jitter(width = 0.5, size = 2.5) + 
   labs(y = NULL, x = "Score") + 
-  scale_colour_brewer(palette = "Dark2") + ##changed it to dark to make a better contrast
-  scale_shape_manual(values = c("DUBLIN" = 16, "CORK" = 15, "KERRY" =17, "MAYO" =18 )) + ##add shape 
+  scale_colour_brewer(palette = "Dark2") +
+  scale_shape_manual(values = c("DUBLIN" = 16, "CORK" = 15, "KERRY" =17, "MAYO" =18 )) +
   theme(legend.position="none")
 croke_plot <- ggplotly(plot, tooltip = c("x","y")) %>%
   layout(annotations = b)
@@ -282,7 +308,7 @@ dubnew1 <- dubnew %>%
 gaa_dublin <- dubnew1 %>% 
   mutate(Dublin_Score = case_when(
                             Opp_Name == "DUBLIN" & Team_Score<Opp_Score  ~ Opp_Score,
-                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ Team_Score)) #Changed Winner_Score to Dublin_Score For thr dublin plot
+                            Opp_Name == "DUBLIN" & Team_Score>Opp_Score  ~ Team_Score)) 
 
 gaa_dublin[is.na(gaa_dublin)] = 0
 gaa_dublin <- gaa_dublin[gaa_dublin$Dublin_Score !=0,]
@@ -292,25 +318,34 @@ gaa_dublin <- gaa_dublin %>% filter(Winner != "OTHER TEAM")
 plot2 <- ggplot(gaa_dublin, aes(x= Dublin_Score, y = Venue, color = Venue)) + 
   geom_jitter(width = 0.5, size = 2.5) + 
   labs(y = NULL, x = "Score") + 
-  scale_colour_brewer(palette = "Accent") + ##changed colour cause too close to the team plot colours
+  scale_colour_brewer(palette = "Accent") + 
   theme(legend.position="none")  
 dub_plot <- ggplotly(plot2, tooltip = c("x","y")) %>%
-  layout(annotations = a) ###Removed the colour variable cause it is a repeat
+  layout(annotations = a) 
 
 # Combine both plots together
 subplot(dub_plot, croke_plot, nrows=1, margin = 0.05, titleX = TRUE, titleY = TRUE)
 ```
+
+
+This graphic shows a split scatterplot with one side being dedicated to the points scored by Dublin in matches they won in the four stadiums displayed previously and the other is dedicated to showing the points scored by the top four teams in matches they won in Croke Park. This graphic is interactive, when the curser is hovered over one of the points on the left side it will show the points scored by Dublin and the venue it occurred in. When the curser is hovered over the points on the right side it will show the points scored and the team who scored them. In both sides Dublin is identified by a circular shape with each other county being identified by a different shape. From this graphic it is evident that when Dublin wins in Croke Park it is with a much higher score than any other venue and that when Mayo, Kerry, and Cork win in Croke Park it is with a much lower point average. This emphasizes that Dublin plays better in Croke park than in other venues and compared to other teams. 
+
+
 ### Conclusion
-a concluding paragraph summarising your finds.
+
+
+What impact does Croke Park have on Dublin Gaelic Football Team performance? Based on the graphics displayed previously it can be seen that Dublin plays more in Croke Park compared to other Teams, has a higher win to loss ratio there compared to other venues and teams, in the games they win in Croke Park they score much higher compared to other venues and other teams. These findings also hold in comparison to Parnell Park, Dublin’s true home stadium. Based on these findings it was concluded that Croke Park has a positive impact on the Dublin Gaelic Football Team’s performance. This could be due to several different factors. One factor could be the capacity of Croke Park which is significantly larger than Parnell Park, this allows more Dublin supporters to be present during their games. Following from this, the fact that Croke Park is in Dublin is also a factor allowing more Dublin supporters to be present for games compared to other counties. Another factor is the frequency of games they play in Croke Park which during the period this data was collected is much higher than any other team making them more accustomed to playing in the ground. The combination of these factors essentially gives Dublin a home advantage in Croke Park and thus Croke Park has a positive impact on Dublin’s performance. 
+
 
 ### Responsibilities
-I, Con Anthony Mc Cord had primary responsibility for the material in XXXXX. 
 
-I, Jade Eve Sweeney had primary responsibility for the material in XXXXX. 
+I, Con Anthony Mc Cord had primary responsibility for the material in the introduction section.
 
-I, Mikaela Jaya Sminia had primary responsibility for the material in XXXXX. 
+I, Jade Eve Sweeney had primary responsibility for the material in the data adjustments section. 
 
- 
+I, Mikaela Jaya Sminia had primary responsibility for the material in the analysis section. 
 
-Although each team member had a section for which they were primarily responsible the input of each team member was invaluable for each one of us in completing our individual sections. This report required the skills of each team member in its completion.  
+Each of us were equally responsible for the material in the conclusion section. 
+
+Although each team member had a section for which they were primarily responsible the input of each team member was invaluable for each one of us in completing our individual sections. This report required the skills of each team member in its completion.   
 
